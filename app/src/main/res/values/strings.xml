@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">FYP Application - Waster</string>
+    <string name="btn_add_bin_text">Add Bin</string>
+    <string name="bin_name_text_hint">Bin Name</string>
+    <string name="bin_latitude_text_hint">Bin Latitude</string>
+    <string name="bin_longitude_text_hint">Bin Longitude</string>
+    <string name="bin_photo_text_hint">Bin Photo</string>
+    <string name="go_to_add_a_bin">Go to Add a Bin</string>
+    <string name="add_a_bin_heading">Go to Add a Bin</string>
+</resources>
