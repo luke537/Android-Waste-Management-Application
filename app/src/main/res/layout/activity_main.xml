@@ -9,8 +9,22 @@
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/customRecyclerView"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" >
+        android:layout_height="match_parent"
+        tools:layout_editor_absoluteX="161dp"
+        tools:layout_editor_absoluteY="535dp">
+
     </androidx.recyclerview.widget.RecyclerView>
+
+    <Button
+        android:id="@+id/button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="32dp"
+        android:onClick="onSearchForBinButtonClick"
+        android:text="@string/search_for_a_bin"
+        app:layout_constraintBottom_toTopOf="@+id/btnGoToAddBin"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 
     <Button
         android:id="@+id/btnGoToAddBin"

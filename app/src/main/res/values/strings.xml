@@ -7,4 +7,7 @@
     <string name="bin_photo_text_hint">Bin Photo</string>
     <string name="go_to_add_a_bin">Go to Add a Bin</string>
     <string name="add_a_bin_heading">Go to Add a Bin</string>
+    <string name="google_maps_api_key">AIzaSyDxVFnLFnAYk109PjJd1mQvUzBV5-nfXhs</string>
+    <string name="title_activity_maps">Map</string>
+    <string name="search_for_a_bin">Search for a Bin</string>
 </resources>

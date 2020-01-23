@@ -2,16 +2,17 @@ package com.example.fypapplication_waster.model;
 
 import com.google.gson.annotations.SerializedName;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
-public class BinToBeReceived {
+public class BinToBeReceived implements Serializable {
 
     @SerializedName("_id")
     private MongoDbId binId;
     @SerializedName("name")
     private String name;
     @SerializedName("location")
-    private ArrayList location;
+    private Location location;
     @SerializedName("photo")
     private String photo;
     @SerializedName("materials")
@@ -25,7 +26,7 @@ public class BinToBeReceived {
     @SerializedName("hours")
     private String hours;
 
-    public BinToBeReceived(MongoDbId binId, String name, ArrayList location, String photo,
+    public BinToBeReceived(MongoDbId binId, String name, Location location, String photo,
                            ArrayList materials, String owner, ArrayList comments,
                            Double price, String hours) {
         this.binId = binId;
@@ -55,11 +56,11 @@ public class BinToBeReceived {
         this.name = name;
     }
 
-    public ArrayList getLocation() {
+    public Location getLocation() {
         return location;
     }
 
-    public void setLocation(ArrayList location) {
+    public void setLocation(Location location) {
         this.location = location;
     }
 
