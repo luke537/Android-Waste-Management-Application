@@ -2,7 +2,9 @@ package com.example.fypapplication_waster.model;
 
 import com.google.gson.annotations.SerializedName;
 
-public class MongoDbId {
+import java.io.Serializable;
+
+public class MongoDbId implements Serializable {
 
     @SerializedName("$oid")
     private String $oid;
@@ -19,3 +21,4 @@ public class MongoDbId {
         this.$oid = $oid;
     }
 }
+

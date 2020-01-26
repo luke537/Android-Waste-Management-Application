@@ -133,6 +133,11 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
+    public void onGoToAddButtonClick(View v){
+        Intent myIntent = new Intent(getBaseContext(), AddBinActivity.class);
+        startActivity(myIntent);
+    }
+
     private ArrayList<String> permissionsToRequest(ArrayList<String> wantedPermissions) {
         ArrayList<String> result = new ArrayList<>();
 

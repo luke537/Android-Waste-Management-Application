@@ -2,9 +2,10 @@ package com.example.fypapplication_waster.model;
 
 import com.google.gson.annotations.SerializedName;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
-public class Location {
+public class Location implements Serializable {
 
     @SerializedName("coordinates")
     private ArrayList coordinates;
