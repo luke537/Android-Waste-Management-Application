@@ -10,4 +10,9 @@
     <string name="google_maps_api_key">AIzaSyDxVFnLFnAYk109PjJd1mQvUzBV5-nfXhs</string>
     <string name="title_activity_maps">Map</string>
     <string name="search_for_a_bin">Search for a Bin</string>
+    <string name="accepted_materials">Accepted Materials</string>
+    <string name="comments">Comments</string>
+    <string name="btnCancelTxt">Cancel</string>
+    <string name="btnDirectionsTxt">Directions</string>
+    <string name="desc_a_picture_of_the_selected_bin">A Picture of the Selected Bin</string>
 </resources>

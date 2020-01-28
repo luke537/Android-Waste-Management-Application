@@ -1,9 +1,14 @@
 package com.example.fypapplication_waster;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.FragmentActivity;
 
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
+import android.widget.TextView;
 
 import com.example.fypapplication_waster.model.BinToBeReceived;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -13,6 +18,8 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+
+import org.w3c.dom.Text;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -26,6 +33,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private Double latitude;
     private Double longitude;
     private ArrayList bins;
+    AlertDialog dialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,6 +47,15 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+
+        if (dialog.isShowing()) {
+            dialog.dismiss();
+        }
     }
 
 
@@ -77,28 +94,83 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         // Retrieve the data from the marker.
         BinToBeReceived bin = (BinToBeReceived) marker.getTag();
 
-        // Check if a click count was set, then display the click count.
         if (bin != null) {
-            new SweetAlertDialog(this, SweetAlertDialog.NORMAL_TYPE)
-                    .setTitleText(bin.getName())
-                    .setContentText((String) bin.getComments().get(0))
-                    .setCancelText("Back")
-                    .setConfirmText("Directions")
-                    .showCancelButton(true)
-                    .setCancelClickListener(new SweetAlertDialog.OnSweetClickListener() {
-                        @Override
-                        public void onClick(SweetAlertDialog sDialog) {
-                            sDialog.cancel();
-                        }
-                    })
-                    .setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener() {
-                        @Override
-                        public void onClick(SweetAlertDialog sweetAlertDialog) {
-                            //Do something to get directions to the bin
-                        }
-                    })
-                    .show();
+            AlertDialog.Builder mBuilder = new AlertDialog.Builder(MapsActivity.this);
+            View mView = getLayoutInflater().inflate(R.layout.bin_info_modal, null);
+            final TextView mBinName = (TextView) mView.findViewById(R.id.txtBinName);
+            final TextView mBinMaterials = (TextView) mView.findViewById(R.id.txtBinMaterials);
+            final TextView mBinComments = (TextView) mView.findViewById(R.id.txtBinComments);
+
+            mBinName.setText(bin.getName());
+
+            for (Object material : bin.getMaterials()) {
+                mBinMaterials.append((String) material + "\n");
+            }
+
+            for (Object comment : bin.getComments()) {
+                mBinComments.append((String) comment + "\n");
+            }
+
+//            mBuilder.setPositiveButton(R.string.btnDirectionsTxt, new DialogInterface.OnClickListener() {
+//                @Override
+//                public void onClick(DialogInterface dialog, int which) {
+//                    // Do something for getting directions to the bin
+//                }
+//            });
+//
+//            mBuilder.setNegativeButton(R.string.btnCancelTxt, new DialogInterface.OnClickListener() {
+//                @Override
+//                public void onClick(DialogInterface dialog, int which) {
+//                    dialog.cancel();
+//                }
+//            });
+
+
+            mBuilder.setView(mView);
+            dialog = mBuilder.create();
+
+            Button btnCancel = mView.findViewById(R.id.btnCancelBinInfoModal);
+            btnCancel.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    dialog.cancel();
+                    dialog.dismiss();
+                }
+            });
+
+            Button btnDirections = mView.findViewById(R.id.btnDirections);
+            btnDirections.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    //Get directions to bin
+                }
+            });
+
+            dialog.show();
         }
+
+        // Check if a click count was set, then display the click count.
+//        if (bin != null) {
+//            new SweetAlertDialog(this, SweetAlertDialog.NORMAL_TYPE)
+//                    .setTitleText(bin.getName())
+//                    .setContentText((String) bin.getComments().get(0))
+//                    .setCancelText("Back")
+//                    .setConfirmText("Directions")
+//                    .showCancelButton(true)
+//                    .setCancelClickListener(new SweetAlertDialog.OnSweetClickListener() {
+//                        @Override
+//                        public void onClick(SweetAlertDialog sDialog) {
+//                            sDialog.cancel();
+//                        }
+//                    })
+//                    .setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener() {
+//                        @Override
+//                        public void onClick(SweetAlertDialog sweetAlertDialog) {
+//                            //Do something to get directions to the bin
+//                        }
+//                    })
+//                    .show();
+//        }
 
         // Return false to indicate that we have not consumed the event and that we wish
         // for the default behavior to occur (which is for the camera to move such that the

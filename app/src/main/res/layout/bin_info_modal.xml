@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="20dp">
+
+    <ImageView
+        android:id="@+id/imgBinPic"
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        android:contentDescription="@string/desc_a_picture_of_the_selected_bin"
+        android:scaleType="fitCenter"
+        app:srcCompat="@drawable/amu_bubble_shadow" />
+
+    <TextView
+        android:id="@+id/txtBinName"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textAppearance="@style/TextAppearance.AppCompat.Display1" />
+
+    <TextView
+        android:id="@+id/txtBinMaterialsLabel"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/accepted_materials"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/txtBinMaterials"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <TextView
+        android:id="@+id/txtBinCommentsLabel"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/comments"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/txtBinComments"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/btnCancelBinInfoModal"
+            style="@style/Widget.AppCompat.Button.Colored"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@color/colorAccent"
+            android:text="@string/btnCancelTxt"
+            android:textColor="#ffffff" />
+
+        <Button
+            android:id="@+id/btnDirections"
+            style="@style/Widget.AppCompat.Button.Colored"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@color/colorPrimary"
+            android:text="@string/btnDirectionsTxt"
+            android:textColor="#ffffff" />
+    </LinearLayout>
+</LinearLayout>

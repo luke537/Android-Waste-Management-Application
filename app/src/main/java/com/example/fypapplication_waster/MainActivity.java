@@ -106,8 +106,6 @@ public class MainActivity extends AppCompatActivity
             Toast.makeText(this, "Latitude : " + location.getLatitude() + "\nLongitude : " + location.getLongitude(), Toast.LENGTH_LONG);
             Double latitude = location.getLatitude();
             Double longitude = location.getLongitude();
-            Log.d("MainActivity", "LATITUDE: " + latitude);
-            Log.d("MainActivity", "LONGITUDE: " + longitude);
 
             Call<List<BinToBeReceived>> call = service.getBinsAtLocation(latitude, longitude);
 
@@ -127,7 +125,7 @@ public class MainActivity extends AppCompatActivity
 
                 @Override
                 public void onFailure(Call<List<BinToBeReceived>> call, Throwable t) {
-                    Log.d("MainActivity", "Failure getting bins");
+                    Log.d("MainActivity", "No server response: Failure getting bins");
                 }
             });
         }
