@@ -16,11 +16,10 @@
     </androidx.recyclerview.widget.RecyclerView>
 
     <Button
-        android:id="@+id/button"
+        android:id="@+id/btnSearchForBin"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="32dp"
-        android:onClick="onSearchForBinButtonClick"
         android:text="@string/search_for_a_bin"
         app:layout_constraintBottom_toTopOf="@+id/btnGoToAddBin"
         app:layout_constraintEnd_toEndOf="parent"

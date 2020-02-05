@@ -15,4 +15,11 @@
     <string name="btnCancelTxt">Cancel</string>
     <string name="btnDirectionsTxt">Directions</string>
     <string name="desc_a_picture_of_the_selected_bin">A Picture of the Selected Bin</string>
+    <string name="btnTakePhoto">Take Photo</string>
+    <string name="add_a_bin">Add a Bin</string>
+    <string name="price">Price</string>
+    <string name="glass">Glass</string>
+    <string name="plastic">Plastic</string>
+    <string name="metal">Metal</string>
+    <string name="submit">Submit</string>
 </resources>

@@ -18,6 +18,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.Toast;
 
 import com.example.fypapplication_waster.model.BinToBeReceived;
@@ -89,9 +90,17 @@ public class MainActivity extends AppCompatActivity
 
 
         service = RetrofitClientInstance.getRetrofitInstance().create(GetDataService.class);
+
+        Button btnSearchForBin = findViewById(R.id.btnSearchForBin);
+        btnSearchForBin.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onSearchForBinButtonClick();
+            }
+        });
     }
 
-    public void onSearchForBinButtonClick(View v) {
+    public void onSearchForBinButtonClick() {
         if (ActivityCompat.checkSelfPermission(this,
                 Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
                 &&  ActivityCompat.checkSelfPermission(this,
@@ -126,6 +135,7 @@ public class MainActivity extends AppCompatActivity
                 @Override
                 public void onFailure(Call<List<BinToBeReceived>> call, Throwable t) {
                     Log.d("MainActivity", "No server response: Failure getting bins");
+                    t.printStackTrace();
                 }
             });
         }

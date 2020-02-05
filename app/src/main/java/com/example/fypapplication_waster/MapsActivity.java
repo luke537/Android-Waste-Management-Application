@@ -4,13 +4,23 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.FragmentActivity;
 
 import android.content.DialogInterface;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
+import android.text.TextUtils;
+import android.util.Base64;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.fypapplication_waster.model.BinToBeReceived;
+import com.example.fypapplication_waster.model.BinToBeSent;
+import com.example.fypapplication_waster.network.RetrofitClientInstance;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -19,13 +29,14 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
-import org.w3c.dom.Text;
-
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-import cn.pedant.SweetAlert.SweetAlertDialog;
+import okhttp3.ResponseBody;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, GoogleMap.OnMarkerClickListener {
 
@@ -34,6 +45,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private Double longitude;
     private ArrayList bins;
     AlertDialog dialog;
+    private GetDataService service;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -85,6 +97,84 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         // Set a listener for marker click.
         mMap.setOnMarkerClickListener((GoogleMap.OnMarkerClickListener) this);
+
+        // Set listener for "Add Button" click
+        Button btnAddBin = findViewById(R.id.btnAddBinOnMap);
+        btnAddBin.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onAddBinBtnClick();
+            }
+        });
+    }
+
+    private void onAddBinBtnClick() {
+        AlertDialog.Builder mBuilder = new AlertDialog.Builder(MapsActivity.this);
+        View mView = getLayoutInflater().inflate(R.layout.add_bin_modal, null);
+
+        final TextView binName = (TextView) mView.findViewById(R.id.txtBinName);
+        final CheckBox cbxGlass = mView.findViewById(R.id.cbxGlass);
+        final CheckBox cbxPlastic = mView.findViewById(R.id.cbxPlastic);
+        final CheckBox cbxMetal = mView.findViewById(R.id.cbxMetal);
+        final EditText binPrice = mView.findViewById(R.id.txtPrice);
+
+        mBuilder.setView(mView);
+        dialog = mBuilder.create();
+
+        Button btnCancel = mView.findViewById(R.id.btnCancelAddBin);
+        btnCancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.cancel();
+                dialog.dismiss();
+            }
+        });
+
+        Button btnSubmit = mView.findViewById(R.id.btnSubmitBin);
+        btnSubmit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+
+                // Validate fields
+                if (!TextUtils.isEmpty(binName.getText()) && !TextUtils.isEmpty(binPrice.getText())) {
+                    ArrayList materials = new ArrayList<>();
+
+                    if (cbxGlass.isChecked()) { materials.add("glass"); }
+                    if (cbxMetal.isChecked()) { materials.add("metal"); }
+                    if (cbxPlastic.isChecked()) { materials.add("plastic"); }
+
+
+                    // POST bin to server
+                    service = RetrofitClientInstance.getRetrofitInstance().create(GetDataService.class);
+                    Call<ResponseBody> call = service.addBin(new BinToBeSent(binName.getText().toString(), latitude, longitude, null, materials, null, null, Double.valueOf(binPrice.getText().toString()), null));
+
+                    call.enqueue(new Callback<ResponseBody>() {
+                        @Override
+                        public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                            Log.d("MapsActivity -> Add", response.message());
+                            dialog.dismiss();
+                            if (response.isSuccessful()) {
+                                Toast.makeText(MapsActivity.this, "Bin added successfully!", Toast.LENGTH_SHORT).show();
+                                Log.d("AddBinActivity", "Bin Added Successfully");
+                            }
+                        }
+
+                        @Override
+                        public void onFailure(Call<ResponseBody> call, Throwable t) {
+                            Toast.makeText(MapsActivity.this, "Something went wrong...Please try later!", Toast.LENGTH_SHORT).show();
+                            Log.e("AddBinActivity", "Connection Failed\n" + t.getMessage());
+                        }
+                    });
+                }
+
+                else {
+                    Toast.makeText(MapsActivity.this, "Something went wrong...Please try later!", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+
+        dialog.show();
     }
 
     /** Called when the user clicks a marker. */
@@ -100,30 +190,27 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             final TextView mBinName = (TextView) mView.findViewById(R.id.txtBinName);
             final TextView mBinMaterials = (TextView) mView.findViewById(R.id.txtBinMaterials);
             final TextView mBinComments = (TextView) mView.findViewById(R.id.txtBinComments);
+//            final ImageView binImg = mView.findViewById(R.id.imgBinPic);
+//
+//            String encodedImage = bin.getPhoto();
+//            byte[] decodedString = Base64.decode(encodedImage, Base64.DEFAULT);
+//            Bitmap decodedByte = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
+//
+//            binImg.setImageBitmap(decodedByte);
 
             mBinName.setText(bin.getName());
 
-            for (Object material : bin.getMaterials()) {
-                mBinMaterials.append((String) material + "\n");
+            if (bin.getMaterials() != null) {
+                for (Object material : bin.getMaterials()) {
+                    mBinMaterials.append((String) material + "\n");
+                }
             }
 
-            for (Object comment : bin.getComments()) {
-                mBinComments.append((String) comment + "\n");
+            if (bin.getComments() != null) {
+                for (Object comment : bin.getComments()) {
+                    mBinComments.append((String) comment + "\n");
+                }
             }
-
-//            mBuilder.setPositiveButton(R.string.btnDirectionsTxt, new DialogInterface.OnClickListener() {
-//                @Override
-//                public void onClick(DialogInterface dialog, int which) {
-//                    // Do something for getting directions to the bin
-//                }
-//            });
-//
-//            mBuilder.setNegativeButton(R.string.btnCancelTxt, new DialogInterface.OnClickListener() {
-//                @Override
-//                public void onClick(DialogInterface dialog, int which) {
-//                    dialog.cancel();
-//                }
-//            });
 
 
             mBuilder.setView(mView);
@@ -148,33 +235,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
             dialog.show();
         }
-
-        // Check if a click count was set, then display the click count.
-//        if (bin != null) {
-//            new SweetAlertDialog(this, SweetAlertDialog.NORMAL_TYPE)
-//                    .setTitleText(bin.getName())
-//                    .setContentText((String) bin.getComments().get(0))
-//                    .setCancelText("Back")
-//                    .setConfirmText("Directions")
-//                    .showCancelButton(true)
-//                    .setCancelClickListener(new SweetAlertDialog.OnSweetClickListener() {
-//                        @Override
-//                        public void onClick(SweetAlertDialog sDialog) {
-//                            sDialog.cancel();
-//                        }
-//                    })
-//                    .setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener() {
-//                        @Override
-//                        public void onClick(SweetAlertDialog sweetAlertDialog) {
-//                            //Do something to get directions to the bin
-//                        }
-//                    })
-//                    .show();
-//        }
-
-        // Return false to indicate that we have not consumed the event and that we wish
-        // for the default behavior to occur (which is for the camera to move such that the
-        // marker is centered and for the marker's info window to open, if it has one).
         return false;
     }
 

@@ -6,4 +6,17 @@
     android:name="com.google.android.gms.maps.SupportMapFragment"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MapsActivity" />
+    tools:context=".MapsActivity">
+
+    <Button
+        android:id="@+id/btnAddBinOnMap"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center|bottom"
+        android:layout_marginBottom="20dp"
+        android:padding="10dp"
+        android:text="@string/add_a_bin"
+        android:background="@color/colorPrimary"
+        android:textColor="#ffffff"/>
+
+</fragment>
