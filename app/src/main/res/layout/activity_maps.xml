@@ -16,7 +16,7 @@
         android:layout_marginBottom="20dp"
         android:padding="10dp"
         android:text="@string/add_a_bin"
-        android:background="@color/colorPrimary"
+        android:background="#3ED1B0"
         android:textColor="#ffffff"/>
 
 </fragment>
