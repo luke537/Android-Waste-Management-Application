@@ -7,6 +7,7 @@ import androidx.fragment.app.Fragment;
 import android.os.Bundle;
 import android.view.MenuItem;
 
+import com.google.android.gms.maps.MapFragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 public class MainActivity extends AppCompatActivity {
@@ -31,22 +32,33 @@ public class MainActivity extends AppCompatActivity {
             new BottomNavigationView.OnNavigationItemSelectedListener() {
                 @Override
                 public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                    Fragment selectedFragment = null;
+//                    if (item.getItemId() != R.id.navMap) {
+                        Fragment selectedFragment = null;
 
-                    switch (item.getItemId()) {
-                        case R.id.navNewRecycle:
-                            selectedFragment = new RecycleFragment();
-                            break;
-                        case R.id.navMap:
-                            selectedFragment = new MapFragment();
-                            break;
-                        case R.id.navProfile:
-                            selectedFragment = new ProfileFragment();
-                            break;
-                    }
+                        switch (item.getItemId()) {
+                            case R.id.navNewRecycle:
+                                selectedFragment = new RecycleFragment();
+                                break;
+                            case R.id.navMap:
+                                selectedFragment = new AllBinsMapFragment();
+                                break;
+                            case R.id.navProfile:
+                                selectedFragment = new ProfileFragment();
+                                break;
+                        }
 
-                    getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer,
-                            selectedFragment).commit();
+                        getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer,
+                                selectedFragment).commit();
+//                    }
+
+//                    else {
+//                        MapFragment selectedFragment = new AllBinsMapFragment();
+//                        getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer,
+//                                selectedFragment).commit();
+//
+//                    }
+
+
 
                     return true;
                 }
