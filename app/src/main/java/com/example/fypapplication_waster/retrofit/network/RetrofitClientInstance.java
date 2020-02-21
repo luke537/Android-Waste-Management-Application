@@ -1,4 +1,4 @@
-package com.example.fypapplication_waster.network;
+package com.example.fypapplication_waster.retrofit.network;
 
 import com.google.gson.GsonBuilder;
 

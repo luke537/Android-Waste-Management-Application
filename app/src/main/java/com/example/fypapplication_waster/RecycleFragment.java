@@ -18,7 +18,9 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
-import com.example.fypapplication_waster.model.BinToBeReceived;
+import com.example.fypapplication_waster.retrofit.model.BinToBeReceived;
+import com.example.fypapplication_waster.old.MapsActivity;
+import com.example.fypapplication_waster.retrofit.GetDataService;
 import com.example.fypapplication_waster.util.RetrofitUtils;
 
 import java.util.ArrayList;

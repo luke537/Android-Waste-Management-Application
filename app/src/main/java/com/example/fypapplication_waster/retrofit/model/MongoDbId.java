@@ -1,4 +1,4 @@
-package com.example.fypapplication_waster.model;
+package com.example.fypapplication_waster.retrofit.model;
 
 import com.google.gson.annotations.SerializedName;
 

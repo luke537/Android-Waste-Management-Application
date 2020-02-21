@@ -1,16 +1,16 @@
-package com.example.fypapplication_waster;
+package com.example.fypapplication_waster.old;
 
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.recyclerview.widget.RecyclerView;
 
 
-import com.example.fypapplication_waster.model.BinToBeReceived;
+import com.example.fypapplication_waster.R;
+import com.example.fypapplication_waster.retrofit.model.BinToBeReceived;
 
 import java.util.List;
 

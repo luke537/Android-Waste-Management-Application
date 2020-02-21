@@ -21,8 +21,8 @@
 //import android.widget.Button;
 //import android.widget.Toast;
 //
-//import com.example.fypapplication_waster.model.BinToBeReceived;
-//import com.example.fypapplication_waster.network.RetrofitClientInstance;
+//import com.example.fypapplication_waster.retrofit.model.BinToBeReceived;
+//import com.example.fypapplication_waster.retrofit.network.RetrofitClientInstance;
 //import com.google.android.gms.common.ConnectionResult;
 //import com.google.android.gms.common.GoogleApiAvailability;
 //import com.google.android.gms.common.api.Api;

@@ -2,9 +2,9 @@ package com.example.fypapplication_waster.util;
 
 import android.util.Log;
 
-import com.example.fypapplication_waster.GetDataService;
-import com.example.fypapplication_waster.model.BinToBeReceived;
-import com.example.fypapplication_waster.network.RetrofitClientInstance;
+import com.example.fypapplication_waster.retrofit.GetDataService;
+import com.example.fypapplication_waster.retrofit.model.BinToBeReceived;
+import com.example.fypapplication_waster.retrofit.network.RetrofitClientInstance;
 
 import java.util.List;
 

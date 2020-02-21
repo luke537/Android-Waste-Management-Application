@@ -1,26 +1,23 @@
-package com.example.fypapplication_waster;
+package com.example.fypapplication_waster.old;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.FragmentActivity;
 
-import android.content.DialogInterface;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.text.TextUtils;
-import android.util.Base64;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.fypapplication_waster.model.BinToBeReceived;
-import com.example.fypapplication_waster.model.BinToBeSent;
-import com.example.fypapplication_waster.network.RetrofitClientInstance;
+import com.example.fypapplication_waster.retrofit.GetDataService;
+import com.example.fypapplication_waster.R;
+import com.example.fypapplication_waster.retrofit.model.BinToBeReceived;
+import com.example.fypapplication_waster.retrofit.model.BinToBeSent;
+import com.example.fypapplication_waster.retrofit.network.RetrofitClientInstance;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -30,7 +27,6 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import okhttp3.ResponseBody;
 import retrofit2.Call;
