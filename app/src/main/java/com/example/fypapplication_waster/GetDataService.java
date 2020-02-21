@@ -28,6 +28,9 @@ public interface GetDataService {
     @GET("bins/{latitude}/{longitude}")
     Call<List<BinToBeReceived>> getBinsAtLocation(@Path("latitude") Double latitude, @Path("longitude") Double longitude);
 
+    @GET("bins/{material}/{latitude}/{longitude}")
+    Call<List<BinToBeReceived>> getBinsAtLocationAndMaterial(@Path("material") String material, @Path("latitude") Double latitude, @Path("longitude") Double longitude);
+
     @POST("add_bin")
     Call<ResponseBody> addBin(@Body BinToBeSent bin);
 

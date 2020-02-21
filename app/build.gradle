@@ -45,5 +45,7 @@ dependencies {
     implementation "org.permissionsdispatcher:permissionsdispatcher:4.6.0"
     annotationProcessor "org.permissionsdispatcher:permissionsdispatcher-processor:4.6.0"
 
+    implementation 'io.nlopez.smartlocation:library:3.3.3'
+
     //Front-End Libraries:
 }

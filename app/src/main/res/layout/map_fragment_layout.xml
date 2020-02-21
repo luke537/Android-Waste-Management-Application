@@ -4,15 +4,17 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <com.google.android.gms.maps.MapView
-        android:id="@+id/mapView"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:apiKey="@string/google_maps_api_key"/>
-<!--    <fragment-->
-<!--        class="com.google.android.gms.maps.SupportMapFragment"-->
+<!--    <com.google.android.gms.maps.MapView-->
+<!--        android:id="@+id/mapView"-->
 <!--        android:layout_width="match_parent"-->
-<!--        android:layout_height="match_parent"/>-->
+<!--        android:layout_height="match_parent"-->
+<!--        android:apiKey="@string/google_maps_api_key"/>-->
+
+    <fragment
+        android:id="@+id/google_map_fragment"
+        class="com.google.android.gms.maps.SupportMapFragment"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
 
 <!--    <Button android:id="@+id/btnAddBinOnMap"-->
 <!--        android:layout_width="wrap_content"-->

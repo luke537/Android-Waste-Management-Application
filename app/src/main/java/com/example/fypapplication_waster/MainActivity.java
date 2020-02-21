@@ -7,24 +7,26 @@ import androidx.fragment.app.Fragment;
 import android.os.Bundle;
 import android.view.MenuItem;
 
-import com.google.android.gms.maps.MapFragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 public class MainActivity extends AppCompatActivity {
+
+    final RecycleFragment recycleFragment = new RecycleFragment();
+    final AllBinsMapFragment allBinsMapFragment = new AllBinsMapFragment();
+    final ProfileFragment profileFragment = new ProfileFragment();
+
+    Fragment activeFragment = recycleFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        BottomNavigationView bottomNav = findViewById(R.id.bottomNavigation);
-        bottomNav.setOnNavigationItemSelectedListener(navListener);
+        getSupportFragmentManager().beginTransaction().add(R.id.fragmentContainer, recycleFragment).commit();
 
-        //I added this if statement to keep the selected fragment when rotating the device
-        if (savedInstanceState == null) {
-            getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer,
-                    new RecycleFragment()).commit();
-        }
+        BottomNavigationView bottomNav = findViewById(R.id.bottomNavigation);
+        bottomNav.setSelectedItemId(R.id.navNewRecycle);
+        bottomNav.setOnNavigationItemSelectedListener(navListener);
     }
 
 
@@ -32,35 +34,63 @@ public class MainActivity extends AppCompatActivity {
             new BottomNavigationView.OnNavigationItemSelectedListener() {
                 @Override
                 public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-//                    if (item.getItemId() != R.id.navMap) {
-                        Fragment selectedFragment = null;
+                    switch (item.getItemId()) {
+                        case R.id.navNewRecycle:
+                            if (recycleFragment.isAdded()) {
+                                getSupportFragmentManager().beginTransaction().hide(activeFragment).show(recycleFragment).commit();
+                            }
+                            else {
+                                getSupportFragmentManager().beginTransaction()
+                                        .add(R.id.fragmentContainer, recycleFragment, "recycleFragment")
+                                        .hide(activeFragment).commit();
+                            }
 
-                        switch (item.getItemId()) {
-                            case R.id.navNewRecycle:
-                                selectedFragment = new RecycleFragment();
-                                break;
-                            case R.id.navMap:
-                                selectedFragment = new AllBinsMapFragment();
-                                break;
-                            case R.id.navProfile:
-                                selectedFragment = new ProfileFragment();
-                                break;
-                        }
+                            activeFragment = recycleFragment;
+                            break;
 
-                        getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer,
-                                selectedFragment).commit();
-//                    }
+                        case R.id.navMap:
+                            if (allBinsMapFragment.isAdded()) {
+                                getSupportFragmentManager().beginTransaction().hide(activeFragment).show(allBinsMapFragment).commit();
+                            }
+                            else {
+                                getSupportFragmentManager().beginTransaction()
+                                        .add(R.id.fragmentContainer, allBinsMapFragment, "allBinsMapFragment")
+                                        .hide(activeFragment).commit();
+                            }
 
-//                    else {
-//                        MapFragment selectedFragment = new AllBinsMapFragment();
-//                        getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer,
-//                                selectedFragment).commit();
-//
-//                    }
+                            activeFragment = allBinsMapFragment;
+                            break;
 
+                        case R.id.navProfile:
+                            if (profileFragment.isAdded()) {
+                                getSupportFragmentManager().beginTransaction().hide(activeFragment).show(profileFragment).commit();
+                            }
+                            else {
+                                getSupportFragmentManager().beginTransaction()
+                                        .add(R.id.fragmentContainer, profileFragment, "profileFragment")
+                                        .hide(activeFragment).commit();
+                            }
 
+                            activeFragment = profileFragment;
+                            break;
+                    }
 
                     return true;
                 }
             };
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode,
+                                           String permissions[], int[] grantResults) {
+        if (requestCode == AllBinsMapFragment.MY_PERMISSIONS_REQUEST_LOCATION){
+            allBinsMapFragment.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        }
+
+        else if (requestCode == RecycleFragment.MY_PERMISSIONS_REQUEST_LOCATION){
+            recycleFragment.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        }
+        else {
+            super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        }
+    }
 }

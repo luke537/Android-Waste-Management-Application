@@ -12,4 +12,10 @@
         android:text="Recycle Fragment"
         android:textAlignment="center"
         android:textSize="30sp" />
+
+    <Button
+        android:id="@+id/btnGlass"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Find all bins that accept glass" />
 </LinearLayout>

@@ -65,9 +65,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     protected void onPause() {
         super.onPause();
 
-        if (dialog.isShowing()) {
-            dialog.dismiss();
-        }
+//        if (dialog.isShowing()) {
+//            dialog.dismiss();
+//        }
     }
 
 
