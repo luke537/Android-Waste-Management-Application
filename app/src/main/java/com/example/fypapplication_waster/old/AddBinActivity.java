@@ -1,4 +1,4 @@
-package com.example.fypapplication_waster;
+package com.example.fypapplication_waster.old;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -25,6 +25,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.example.fypapplication_waster.R;
 import com.example.fypapplication_waster.retrofit.model.BinToBeSent;
 import com.example.fypapplication_waster.retrofit.network.RetrofitClientInstance;
 import com.example.fypapplication_waster.retrofit.GetDataService;
@@ -110,51 +111,51 @@ public class AddBinActivity extends AppCompatActivity  implements GoogleApiClien
         btnAddBin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                onAddBinClicked();
+//                onAddBinClicked();
             }
         });
     }
-
-    public void onAddBinClicked() {
-        Log.d("AddBinActivity", "button has been clicked");
-
-        getLocation();
-
-        String binName = ((EditText) findViewById(R.id.add_bin_name)).getText().toString();
-        String binPhoto = encodedImage;
-
-        if (binName.equals("")) {
-            binName = null;
-        }
-
-
-        Log.d("onAddButtonClicked", String.format("encodedImage = %s\nlatitude = %f\nlongitude = %f", encodedImage, latitude, longitude));
-
-        if (binPhoto != null) { //TODO: add validation of fields here
-            service = RetrofitClientInstance.getRetrofitInstance().create(GetDataService.class);
-            Call<ResponseBody> call = service.addBin(new BinToBeSent(binName, latitude, longitude, null, null, null, null, null, null));
-
-            call.enqueue(new Callback<ResponseBody>() {
-                @Override
-                public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                    if (response.isSuccessful()) {
-                        Toast.makeText(AddBinActivity.this, "Bin added successfully!", Toast.LENGTH_SHORT).show();
-                        Log.d("AddBinActivity", "Bin Added Successfully");
-                    }
-                }
-
-                @Override
-                public void onFailure(Call<ResponseBody> call, Throwable t) {
-                    Toast.makeText(AddBinActivity.this, "Something went wrong...Please try later!", Toast.LENGTH_SHORT).show();
-                    Log.e("AddBinActivity", "Connection Failed\n" + t.getMessage());
-                }
-            });
-        }
-
-        else {
-            Log.d("onAddButtonClicked", "Bin photo null");
-        }
-    }
+//
+//    public void onAddBinClicked() {
+//        Log.d("AddBinActivity", "button has been clicked");
+//
+//        getLocation();
+//
+//        String binName = ((EditText) findViewById(R.id.add_bin_name)).getText().toString();
+//        String binPhoto = encodedImage;
+//
+//        if (binName.equals("")) {
+//            binName = null;
+//        }
+//
+//
+//        Log.d("onAddButtonClicked", String.format("encodedImage = %s\nlatitude = %f\nlongitude = %f", encodedImage, latitude, longitude));
+//
+//        if (binPhoto != null) { //TODO: add validation of fields here
+//            service = RetrofitClientInstance.getRetrofitInstance().create(GetDataService.class);
+//            Call<ResponseBody> call = service.addBin(new BinToBeSent(binName, latitude, longitude, null, null, null, null, null, null));
+//
+//            call.enqueue(new Callback<ResponseBody>() {
+//                @Override
+//                public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+//                    if (response.isSuccessful()) {
+//                        Toast.makeText(AddBinActivity.this, "Bin added successfully!", Toast.LENGTH_SHORT).show();
+//                        Log.d("AddBinActivity", "Bin Added Successfully");
+//                    }
+//                }
+//
+//                @Override
+//                public void onFailure(Call<ResponseBody> call, Throwable t) {
+//                    Toast.makeText(AddBinActivity.this, "Something went wrong...Please try later!", Toast.LENGTH_SHORT).show();
+//                    Log.e("AddBinActivity", "Connection Failed\n" + t.getMessage());
+//                }
+//            });
+//        }
+//
+//        else {
+//            Log.d("onAddButtonClicked", "Bin photo null");
+//        }
+//    }
 
     private void dispatchTakePictureIntent() {
         Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);

@@ -59,6 +59,52 @@
 
     </LinearLayout>
 
+    <RadioGroup
+        android:id="@+id/accessibilityRadioGroup"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <RadioButton
+            android:id="@+id/accessRadioBtnInside"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:checked="true"
+            android:text="Inside" />
+
+        <RadioButton
+            android:id="@+id/accessRadioBtnOutside"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:checked="false"
+            android:text="Outside" />
+
+    </RadioGroup>
+
+    <LinearLayout
+        android:id="@+id/linearLayoutBinAccess"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:visibility="gone">
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/txtBuildingName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Building Name" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <Spinner
+            android:id="@+id/spinner"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+    </LinearLayout>
+
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

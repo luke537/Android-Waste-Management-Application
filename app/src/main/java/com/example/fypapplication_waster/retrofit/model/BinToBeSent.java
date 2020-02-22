@@ -24,10 +24,16 @@ public class BinToBeSent {
     private Double price;
     @SerializedName("hours")
     private String hours;
+    @SerializedName("isInside")
+    private boolean isInside;
+    @SerializedName("buildingName")
+    private String buildingName;
+    @SerializedName("buildingFloor")
+    private String buildingFloor;
 
     public BinToBeSent(String name, Double latitude, Double longitude, String photo,
                            ArrayList materials, String owner, ArrayList comments,
-                           Double price, String hours) {
+                           Double price, String hours, boolean isInside, String buildingName, String buildingFloor) {
         this.name = name;
         this.latitude = latitude;
         this.longitude = longitude;
@@ -37,6 +43,9 @@ public class BinToBeSent {
         this.comments = comments;
         this.price = price;
         this.hours = hours;
+        this.isInside = isInside;
+        this.buildingName = buildingName;
+        this.buildingFloor = buildingFloor;
     }
 
     public String getName() {
@@ -111,4 +120,27 @@ public class BinToBeSent {
         this.hours = hours;
     }
 
+    public boolean isInside() {
+        return isInside;
+    }
+
+    public void setInside(boolean inside) {
+        isInside = inside;
+    }
+
+    public String getBuildingName() {
+        return buildingName;
+    }
+
+    public void setBuildingName(String buildingName) {
+        this.buildingName = buildingName;
+    }
+
+    public String getBuildingFloor() {
+        return buildingFloor;
+    }
+
+    public void setBuildingFloor(String buildingFloor) {
+        this.buildingFloor = buildingFloor;
+    }
 }

@@ -99,79 +99,79 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         btnAddBin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                onAddBinBtnClick();
+//                onAddBinBtnClick();
             }
         });
     }
 
-    private void onAddBinBtnClick() {
-        AlertDialog.Builder mBuilder = new AlertDialog.Builder(MapsActivity.this);
-        View mView = getLayoutInflater().inflate(R.layout.add_bin_modal, null);
-
-        final TextView binName = (TextView) mView.findViewById(R.id.txtBinName);
-        final CheckBox cbxGlass = mView.findViewById(R.id.cbxGlass);
-        final CheckBox cbxPlastic = mView.findViewById(R.id.cbxPlastic);
-        final CheckBox cbxMetal = mView.findViewById(R.id.cbxMetal);
-        final EditText binPrice = mView.findViewById(R.id.txtPrice);
-
-        mBuilder.setView(mView);
-        dialog = mBuilder.create();
-
-        Button btnCancel = mView.findViewById(R.id.btnCancelAddBin);
-        btnCancel.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                dialog.cancel();
-                dialog.dismiss();
-            }
-        });
-
-        Button btnSubmit = mView.findViewById(R.id.btnSubmitBin);
-        btnSubmit.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-
-                // Validate fields
-                if (!TextUtils.isEmpty(binName.getText()) && !TextUtils.isEmpty(binPrice.getText())) {
-                    ArrayList materials = new ArrayList<>();
-
-                    if (cbxGlass.isChecked()) { materials.add("glass"); }
-                    if (cbxMetal.isChecked()) { materials.add("metal"); }
-                    if (cbxPlastic.isChecked()) { materials.add("plastic"); }
-
-
-                    // POST bin to server
-                    service = RetrofitClientInstance.getRetrofitInstance().create(GetDataService.class);
-                    Call<ResponseBody> call = service.addBin(new BinToBeSent(binName.getText().toString(), latitude, longitude, null, materials, null, null, Double.valueOf(binPrice.getText().toString()), null));
-
-                    call.enqueue(new Callback<ResponseBody>() {
-                        @Override
-                        public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                            Log.d("MapsActivity -> Add", response.message());
-                            dialog.dismiss();
-                            if (response.isSuccessful()) {
-                                Toast.makeText(MapsActivity.this, "Bin added successfully!", Toast.LENGTH_SHORT).show();
-                                Log.d("AddBinActivity", "Bin Added Successfully");
-                            }
-                        }
-
-                        @Override
-                        public void onFailure(Call<ResponseBody> call, Throwable t) {
-                            Toast.makeText(MapsActivity.this, "Something went wrong...Please try later!", Toast.LENGTH_SHORT).show();
-                            Log.e("AddBinActivity", "Connection Failed\n" + t.getMessage());
-                        }
-                    });
-                }
-
-                else {
-                    Toast.makeText(MapsActivity.this, "Something went wrong...Please try later!", Toast.LENGTH_SHORT).show();
-                }
-            }
-        });
-
-        dialog.show();
-    }
+//    private void onAddBinBtnClick() {
+//        AlertDialog.Builder mBuilder = new AlertDialog.Builder(MapsActivity.this);
+//        View mView = getLayoutInflater().inflate(R.layout.add_bin_modal, null);
+//
+//        final TextView binName = (TextView) mView.findViewById(R.id.txtBinName);
+//        final CheckBox cbxGlass = mView.findViewById(R.id.cbxGlass);
+//        final CheckBox cbxPlastic = mView.findViewById(R.id.cbxPlastic);
+//        final CheckBox cbxMetal = mView.findViewById(R.id.cbxMetal);
+//        final EditText binPrice = mView.findViewById(R.id.txtPrice);
+//
+//        mBuilder.setView(mView);
+//        dialog = mBuilder.create();
+//
+//        Button btnCancel = mView.findViewById(R.id.btnCancelAddBin);
+//        btnCancel.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                dialog.cancel();
+//                dialog.dismiss();
+//            }
+//        });
+//
+//        Button btnSubmit = mView.findViewById(R.id.btnSubmitBin);
+//        btnSubmit.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//
+//
+//                // Validate fields
+//                if (!TextUtils.isEmpty(binName.getText()) && !TextUtils.isEmpty(binPrice.getText())) {
+//                    ArrayList materials = new ArrayList<>();
+//
+//                    if (cbxGlass.isChecked()) { materials.add("glass"); }
+//                    if (cbxMetal.isChecked()) { materials.add("metal"); }
+//                    if (cbxPlastic.isChecked()) { materials.add("plastic"); }
+//
+//
+//                    // POST bin to server
+//                    service = RetrofitClientInstance.getRetrofitInstance().create(GetDataService.class);
+//                    Call<ResponseBody> call = service.addBin(new BinToBeSent(binName.getText().toString(), latitude, longitude, null, materials, null, null, Double.valueOf(binPrice.getText().toString()), null));
+//
+//                    call.enqueue(new Callback<ResponseBody>() {
+//                        @Override
+//                        public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+//                            Log.d("MapsActivity -> Add", response.message());
+//                            dialog.dismiss();
+//                            if (response.isSuccessful()) {
+//                                Toast.makeText(MapsActivity.this, "Bin added successfully!", Toast.LENGTH_SHORT).show();
+//                                Log.d("AddBinActivity", "Bin Added Successfully");
+//                            }
+//                        }
+//
+//                        @Override
+//                        public void onFailure(Call<ResponseBody> call, Throwable t) {
+//                            Toast.makeText(MapsActivity.this, "Something went wrong...Please try later!", Toast.LENGTH_SHORT).show();
+//                            Log.e("AddBinActivity", "Connection Failed\n" + t.getMessage());
+//                        }
+//                    });
+//                }
+//
+//                else {
+//                    Toast.makeText(MapsActivity.this, "Something went wrong...Please try later!", Toast.LENGTH_SHORT).show();
+//                }
+//            }
+//        });
+//
+//        dialog.show();
+//    }
 
     /** Called when the user clicks a marker. */
     @Override

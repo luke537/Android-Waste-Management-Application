@@ -22,4 +22,16 @@
     <string name="plastic">Plastic</string>
     <string name="metal">Metal</string>
     <string name="submit">Submit</string>
+
+
+    <string-array name="floor_array">
+        <item>Ground Floor</item>
+        <item>1st Floor</item>
+        <item>2nd Floor</item>
+        <item>3rd Floor</item>
+        <item>4th Floor</item>
+        <item>5th Floor</item>
+        <item>6th Floor</item>
+        <item>7th Floor</item>
+    </string-array>
 </resources>

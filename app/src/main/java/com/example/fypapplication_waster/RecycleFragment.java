@@ -19,7 +19,6 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
 import com.example.fypapplication_waster.retrofit.model.BinToBeReceived;
-import com.example.fypapplication_waster.old.MapsActivity;
 import com.example.fypapplication_waster.retrofit.GetDataService;
 import com.example.fypapplication_waster.util.RetrofitUtils;
 
@@ -105,7 +104,7 @@ public class RecycleFragment extends Fragment implements OnLocationUpdatedListen
                     Log.d(TAG, "Successful response getting bins");
                     matchedBins = response.body();
 
-                    launchMapIntent();
+//                    launchMapIntent();
                 }
             }
 
@@ -121,13 +120,13 @@ public class RecycleFragment extends Fragment implements OnLocationUpdatedListen
     }
 
 
-    private void launchMapIntent() {
-        Intent myIntent = new Intent(getContext(), MapsActivity.class);
-        myIntent.putExtra("latitude", latitude);
-        myIntent.putExtra("longitude", longitude);
-        myIntent.putExtra("bins", (ArrayList<BinToBeReceived>) matchedBins);
-        startActivity(myIntent);
-    }
+//    private void launchMapIntent() {
+//        Intent myIntent = new Intent(getContext(), MapsActivity.class);
+//        myIntent.putExtra("latitude", latitude);
+//        myIntent.putExtra("longitude", longitude);
+//        myIntent.putExtra("bins", (ArrayList<BinToBeReceived>) matchedBins);
+//        startActivity(myIntent);
+//    }
 
     @Override
     public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {

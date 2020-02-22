@@ -25,10 +25,12 @@ public class BinToBeReceived implements Serializable {
     private Double price;
     @SerializedName("hours")
     private String hours;
+    @SerializedName("accessibility")
+    private Accessibility accessibility;
 
     public BinToBeReceived(MongoDbId binId, String name, Location location, String photo,
                            ArrayList materials, String owner, ArrayList comments,
-                           Double price, String hours) {
+                           Double price, String hours, Accessibility accessibility) {
         this.binId = binId;
         this.name = name;
         this.location = location;
@@ -38,6 +40,7 @@ public class BinToBeReceived implements Serializable {
         this.comments = comments;
         this.price = price;
         this.hours = hours;
+        this.accessibility = accessibility;
     }
 
     public MongoDbId getBinId() {
@@ -112,4 +115,11 @@ public class BinToBeReceived implements Serializable {
         this.hours = hours;
     }
 
+    public Accessibility getAccessibility() {
+        return accessibility;
+    }
+
+    public void setAccessibility(Accessibility accessibility) {
+        this.accessibility = accessibility;
+    }
 }
