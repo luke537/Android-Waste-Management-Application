@@ -79,6 +79,7 @@ import static android.content.Context.POWER_SERVICE;
  * 2. On Accept permission, we call the Retrofit find all bins query
  * 3. Populate map with bin markers
  */
+//TODO Remove new map marker after bin has been added or canceled
 
 public class AllBinsMapFragment extends Fragment implements OnMapReadyCallback, GoogleMap.OnMarkerClickListener, OnLocationUpdatedListener, GoogleMap.OnMarkerDragListener {
 
@@ -130,12 +131,6 @@ public class AllBinsMapFragment extends Fragment implements OnMapReadyCallback, 
         btnAddBin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //TODO: Call a method that drops a marker down for the user to edit position
-                // Create alert modal asking if they want to use current location, or to choose location
-                // If they select current location, open add bin modal
-                // If they select choose location, drop marker down and allow them to drag it
-                    //On markerdragend, create another modal asking if they're happy with location
-                    // If not happy, continue dragging
                 createAskLocationModal();
             }
         });
@@ -360,12 +355,13 @@ public class AllBinsMapFragment extends Fragment implements OnMapReadyCallback, 
 
     @Override
     public void onMarkerDragStart(Marker marker) {
+        marker.hideInfoWindow();
 
     }
 
     @Override
     public void onMarkerDrag(Marker marker) {
-
+        marker.hideInfoWindow();
     }
 
     @Override
