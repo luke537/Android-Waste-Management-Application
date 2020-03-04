@@ -201,19 +201,6 @@ public class AllBinsMapFragment extends Fragment implements OnMapReadyCallback, 
         // Set a listener for marker click.
         mMap.setOnMarkerClickListener(this);
         mMap.setOnMarkerDragListener(this);
-        mMap.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
-            @Override
-            public void onInfoWindowClick(Marker marker) {
-                if (marker.getTag() instanceof BinToBeReceived) {
-                    // TODO open bin info dialog
-                }
-                else {
-                    createAddBinModal();
-                    btnConfirmBinLocation.setVisibility(View.GONE);
-                    btnAddBin.setVisibility(View.VISIBLE);
-                }
-            }
-        });
 
     }
 
