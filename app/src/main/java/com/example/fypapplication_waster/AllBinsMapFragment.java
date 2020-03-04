@@ -1,10 +1,15 @@
 package com.example.fypapplication_waster;
 
 import android.Manifest;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
+import android.provider.MediaStore;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -25,8 +30,13 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.core.content.FileProvider;
 import androidx.fragment.app.Fragment;
 
+import com.cloudinary.Cloudinary;
+import com.cloudinary.android.MediaManager;
+import com.cloudinary.android.policy.TimeWindow;
+import com.cloudinary.utils.ObjectUtils;
 import com.example.fypapplication_waster.retrofit.model.BinToBeReceived;
 import com.example.fypapplication_waster.retrofit.GetDataService;
 import com.example.fypapplication_waster.retrofit.model.BinToBeSent;
@@ -38,9 +48,19 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import io.nlopez.smartlocation.OnLocationUpdatedListener;
 import io.nlopez.smartlocation.SmartLocation;
@@ -48,6 +68,10 @@ import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+
+import static android.app.Activity.RESULT_CANCELED;
+import static android.app.Activity.RESULT_OK;
+import static android.content.Context.POWER_SERVICE;
 
 /**
  * This fragment displays a map showing all bins within a specifc radius of the user's current location
@@ -69,7 +93,11 @@ public class AllBinsMapFragment extends Fragment implements OnMapReadyCallback, 
 
     private final static String TAG = "AllBinsMapFragment";
     public final static int MY_PERMISSIONS_REQUEST_LOCATION = 1;
+    public final static int MY_PERMISSIONS_REQUEST_CAMERA = 2;
+
     private AlertDialog dialog;
+    private ExtendedFloatingActionButton btnAddBin;
+    private ExtendedFloatingActionButton btnConfirmBinLocation;
 
     @Override
     public void onCreate(Bundle bundle) {
@@ -98,11 +126,24 @@ public class AllBinsMapFragment extends Fragment implements OnMapReadyCallback, 
         mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.google_map_fragment);
         setUpMapIfNeeded();
 
-        Button btnAddBin = rootView.findViewById(R.id.btnAddBinOnMap);
+        btnAddBin = rootView.findViewById(R.id.btnAddBinOnMap);
         btnAddBin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 //TODO: Call a method that drops a marker down for the user to edit position
+                // Create alert modal asking if they want to use current location, or to choose location
+                // If they select current location, open add bin modal
+                // If they select choose location, drop marker down and allow them to drag it
+                    //On markerdragend, create another modal asking if they're happy with location
+                    // If not happy, continue dragging
+                createAskLocationModal();
+            }
+        });
+
+        btnConfirmBinLocation = rootView.findViewById(R.id.btnConfirmBinLocation);
+        btnConfirmBinLocation.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
                 createAddBinModal();
             }
         });
@@ -156,15 +197,33 @@ public class AllBinsMapFragment extends Fragment implements OnMapReadyCallback, 
                 mMap.setMyLocationEnabled(true);
             }
         }
+
+        // Set a listener for marker click.
+        mMap.setOnMarkerClickListener(this);
+        mMap.setOnMarkerDragListener(this);
+        mMap.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
+            @Override
+            public void onInfoWindowClick(Marker marker) {
+                if (marker.getTag() instanceof BinToBeReceived) {
+                    // TODO open bin info dialog
+                }
+                else {
+                    createAddBinModal();
+                    btnConfirmBinLocation.setVisibility(View.GONE);
+                    btnAddBin.setVisibility(View.VISIBLE);
+                }
+            }
+        });
+
     }
 
 
     private void zoomInOnMarker(LatLng location) {
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(location,15));
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(location,17));
         // Zoom in, animating the camera.
         mMap.animateCamera(CameraUpdateFactory.zoomIn());
         // Zoom out to zoom level 10, animating with a duration of 2 seconds.
-        mMap.animateCamera(CameraUpdateFactory.zoomTo(15), 2000, null);
+        mMap.animateCamera(CameraUpdateFactory.zoomTo(17), 2000, null);
     }
 
     @Override
@@ -180,6 +239,14 @@ public class AllBinsMapFragment extends Fragment implements OnMapReadyCallback, 
                 }
                 return;
             }
+            case MY_PERMISSIONS_REQUEST_CAMERA:
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    dispatchTakePictureIntent();
+                } else {
+                    Toast.makeText(getActivity(), "permission denied", Toast.LENGTH_LONG).show();
+                }
+                return;
+
 
         }
     }
@@ -219,7 +286,7 @@ public class AllBinsMapFragment extends Fragment implements OnMapReadyCallback, 
 
             for (Object bin : matchedBins) {
                 LatLng binLatLng = new LatLng(((BinToBeReceived) bin).getLocation().getLatitude(), ((BinToBeReceived) bin).getLocation().getLongitude());
-                Marker marker = mMap.addMarker(new MarkerOptions().draggable(true).position(binLatLng).title(((BinToBeReceived) bin).getName()));
+                Marker marker = mMap.addMarker(new MarkerOptions().draggable(false).position(binLatLng).title(((BinToBeReceived) bin).getName()));
                 marker.setTag((BinToBeReceived) bin);
                 mMap.moveCamera(CameraUpdateFactory.newLatLng(binLatLng));
             }
@@ -228,9 +295,6 @@ public class AllBinsMapFragment extends Fragment implements OnMapReadyCallback, 
             LatLng closestBinLatLng = new LatLng(((BinToBeReceived) closestBin).getLocation().getLatitude(), ((BinToBeReceived) closestBin).getLocation().getLongitude());
             zoomInOnMarker(closestBinLatLng);
 
-            // Set a listener for marker click.
-            mMap.setOnMarkerClickListener(this);
-            mMap.setOnMarkerDragListener(this);
         }
 
         else {
@@ -238,6 +302,13 @@ public class AllBinsMapFragment extends Fragment implements OnMapReadyCallback, 
             Toast.makeText(getActivity(), "Unfortunately, there were no bins found in your area", Toast.LENGTH_LONG).show();
         }
 
+    }
+
+    private void drawMarkerOnCurrentLocation() {
+        LatLng latLng = new LatLng(latitude, longitude);
+        Marker marker = mMap.addMarker(new MarkerOptions().draggable(true).position(latLng).title(getResources().getString(R.string.drag_marker_to_change_location)));
+        marker.showInfoWindow();
+        zoomInOnMarker(latLng);
     }
 
     @Override
@@ -312,11 +383,37 @@ public class AllBinsMapFragment extends Fragment implements OnMapReadyCallback, 
 
     @Override
     public void onMarkerDragEnd(Marker marker) {
+        marker.showInfoWindow();
         // Set the lat/long of the new bin to be added to the marker position
         newBinLatitude = marker.getPosition().latitude;
         newBinLongitude = marker.getPosition().longitude;
+    }
 
-        // TODO Bring up modal for adding bin after marker adjusted
+    private void createAskLocationModal() {
+        new AlertDialog.Builder(getContext())
+                .setTitle("Choose Bin Location")
+                .setMessage("Use your current location or choose location?")
+
+                // Specifying a listener allows you to take an action before dismissing the dialog.
+                // The dialog is automatically dismissed when a dialog button is clicked.
+                .setPositiveButton("Use my current location", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int i) {
+                        // Continue with delete operation
+                        createAddBinModal();
+                    }
+                })
+
+                // A null listener allows the button to dismiss the dialog and take no further action.
+                .setNegativeButton("Choose location", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        btnAddBin.setVisibility(View.GONE);
+                        btnConfirmBinLocation.setVisibility(View.VISIBLE);
+                        drawMarkerOnCurrentLocation();
+                    }
+                })
+                .setIcon(R.drawable.ic_location_on_white_24dp)
+                .show();
     }
 
     private void createAddBinModal() {
@@ -333,7 +430,7 @@ public class AllBinsMapFragment extends Fragment implements OnMapReadyCallback, 
         newBinLongitude = longitude;
 
         Spinner spinner = mView.findViewById(R.id.spinner);
-        // Create an ArrayAdapter using the string array and a default spinner layout
+        // Create an ArrayAdapter using the string array andAsy a default spinner layout
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(getContext(),
                 R.array.floor_array, android.R.layout.simple_spinner_item);
         // Specify the layout to use when the list of choices appears
@@ -366,6 +463,18 @@ public class AllBinsMapFragment extends Fragment implements OnMapReadyCallback, 
 
         mBuilder.setView(mView);
         dialog = mBuilder.create();
+
+        Button btnTakePhoto = mView.findViewById(R.id.btnTakePhoto);
+        btnTakePhoto.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+                    ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.CAMERA}, MY_PERMISSIONS_REQUEST_CAMERA);
+                    return;
+                }
+                dispatchTakePictureIntent();
+            }
+        });
 
         Button btnCancel = mView.findViewById(R.id.btnCancelAddBin);
         btnCancel.setOnClickListener(new View.OnClickListener() {
@@ -438,6 +547,89 @@ public class AllBinsMapFragment extends Fragment implements OnMapReadyCallback, 
         });
 
         dialog.show();
+    }
+
+    File photoFile;
+    Uri photoUri;
+    public static final int REQUEST_TAKE_PHOTO = 1;
+    Map uploadedPhotoInfo;
+
+    private void dispatchTakePictureIntent() {
+        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        // Ensure that there's a camera activity to handle the intent
+        if (takePictureIntent.resolveActivity(getActivity().getPackageManager()) != null) {
+            // Create the File where the photo should go
+            try {
+                photoFile = createImageFile();
+            } catch (IOException ex) {
+                // Error occurred while creating the File
+            }
+            // Continue only if the File was successfully created
+            if (photoFile != null) {
+                photoUri = FileProvider.getUriForFile(getContext(),
+                        "com.example.fypapplication_waster.fileprovider",
+                        photoFile);
+//                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
+                startActivityForResult(takePictureIntent, REQUEST_TAKE_PHOTO);
+            }
+        }
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == REQUEST_TAKE_PHOTO) {
+            if (resultCode == RESULT_OK) {
+                //File to upload to cloudinary
+//                Map config = new HashMap();
+//                config.put("cloud_name", "wasterimgdb");
+//                config.put("api_key", "928464184197124");
+//                config.put("api_secret", "Ax9-B9bxCgiy5LgGzuSiUF1iZ7c");
+//                Cloudinary cloudinary = new Cloudinary(config);
+//                try {
+//                    uploadedPhotoInfo = cloudinary.uploader().upload(photoFile.getAbsolutePath(), ObjectUtils.emptyMap());
+//                } catch (IOException e) {
+//                    e.printStackTrace();
+//                }
+
+                String requestId = MediaManager.get().upload(photoUri).unsigned("zjxhx6xz").option("resource_type", "auto").dispatch();
+
+//                String requestId = MediaManager.get().upload(photoUri)
+//                        .unsigned("zjxhx6xz")
+//                        .constrain(TimeWindow.immediate())
+//                        .option("public_id", "my_picture")
+//                        .dispatch();
+
+            } else if (resultCode == RESULT_CANCELED) {
+                // User cancelled the image capture
+                //finish();
+            }
+        }
+    }
+
+//    private File createImageFile() throws IOException {
+//        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+//        String imageFileName = "1mind_" + timeStamp + ".jpg";
+//        File photo = new File(getContext().getFilesDir(),  imageFileName);
+//        return photo;
+//    }
+    String currentPhotoPath;
+
+    private File createImageFile() throws IOException {
+        // Create an image file name
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        String imageFileName = "JPEG_" + timeStamp + "_";
+        File storageDir = getActivity().getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+        File image = File.createTempFile(
+                imageFileName,  /* prefix */
+                ".jpg",         /* suffix */
+                storageDir      /* directory */
+        );
+
+        // Save a file: path for use with ACTION_VIEW intents
+        currentPhotoPath = image.getAbsolutePath();
+        return image;
     }
 
 }

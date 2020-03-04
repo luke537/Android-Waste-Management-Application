@@ -1,24 +1,36 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<fragment xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/google_map_fragment"
+    android:name="com.google.android.gms.maps.SupportMapFragment"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <fragment
-        android:id="@+id/google_map_fragment"
-        class="com.google.android.gms.maps.SupportMapFragment"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
-
-    <Button
+    <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
         android:id="@+id/btnAddBinOnMap"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center|bottom"
-        android:layout_marginBottom="20dp"
+        android:layout_marginBottom="70dp"
+        android:background="@color/colorPrimary"
+        android:backgroundTint="@color/colorPrimary"
+        android:drawableLeft="@android:drawable/ic_input_add"
+        android:drawableTint="#ffffff"
         android:padding="10dp"
         android:text="@string/add_a_bin"
-        android:background="#3ED1B0"
-        android:textColor="#ffffff"/>
+        android:textColor="#ffffff" />
 
-</RelativeLayout>
+    <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+        android:id="@+id/btnConfirmBinLocation"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center|bottom"
+        android:layout_marginBottom="70dp"
+        android:background="@color/colorPrimary"
+        android:backgroundTint="@color/colorPrimary"
+        android:drawableLeft="@android:drawable/ic_input_add"
+        android:drawableTint="#ffffff"
+        android:padding="10dp"
+        android:text="@string/confirm_bin_location"
+        android:textColor="#ffffff"
+        android:visibility="gone"/>
+</fragment>

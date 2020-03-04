@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:padding="20dp">
@@ -11,25 +11,28 @@
         android:layout_height="wrap_content"
         android:text="@string/add_a_bin"
         android:textAlignment="center"
-        android:textAppearance="@style/TextAppearance.AppCompat.Display2" />
+        android:textAppearance="@style/TextAppearance.MaterialComponents.Headline3" />
 
     <com.google.android.material.textfield.TextInputLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:layout_marginTop="15dp"
+        style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox.Dense">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/txtBinName"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="@string/bin_name_text_hint" />
+            android:hint="@string/bin_name_text_hint"/>
 
     </com.google.android.material.textfield.TextInputLayout>
 
     <TextView
+        android:layout_marginTop="15dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/accepted_materials"
-        android:textStyle="bold"/>
+        style="@style/TextAppearance.AppCompat.Body2"/>
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -41,23 +44,33 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="@string/glass" />
+            android:text="@string/glass"
+            android:buttonTint="@color/colorPrimary"/>
 
         <CheckBox
             android:id="@+id/cbxPlastic"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="@string/plastic" />
+            android:text="@string/plastic"
+            android:buttonTint="@color/colorPrimary"/>
 
         <CheckBox
             android:id="@+id/cbxMetal"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="@string/metal" />
+            android:text="@string/metal"
+            android:buttonTint="@color/colorPrimary"/>
 
     </LinearLayout>
+
+    <TextView
+        android:layout_marginTop="15dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Accessibility"
+        style="@style/TextAppearance.AppCompat.Body2"/>
 
     <RadioGroup
         android:id="@+id/accessibilityRadioGroup"
@@ -70,14 +83,16 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:checked="true"
-            android:text="Inside" />
+            android:text="Inside"
+            android:buttonTint="@color/colorPrimary"/>
 
         <RadioButton
             android:id="@+id/accessRadioBtnOutside"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:checked="false"
-            android:text="Outside" />
+            android:text="Outside"
+            android:buttonTint="@color/colorPrimary"/>
 
     </RadioGroup>
 
@@ -85,12 +100,13 @@
         android:id="@+id/linearLayoutBinAccess"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:visibility="gone">
+        android:orientation="vertical">
 
         <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="match_parent"
+            android:layout_marginTop="15dp"
+            style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox.Dense">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/txtBuildingName"
@@ -102,57 +118,60 @@
         <Spinner
             android:id="@+id/spinner"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:layout_marginTop="15dp"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="15dp"
+            android:text="@string/price"
+            style="@style/TextAppearance.AppCompat.Body2"/>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox.Dense">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/txtPrice"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Price per Kg." />
+        </com.google.android.material.textfield.TextInputLayout>
     </LinearLayout>
 
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/price"
-        android:textStyle="bold"/>
-
-    <EditText
-        android:id="@+id/txtPrice"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:ems="10"
-        android:inputType="number"
-        android:hint="Price per kg"/>
-
-
     <Button
-        android:id="@+id/button"
+        android:id="@+id/btnTakePhoto"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="#3ED1B0"
-        android:text="@string/btnTakePhoto"
-        android:textColor="#FFFFFF" />
+        android:layout_marginTop="15dp"
+        android:text="@string/btnTakePhoto"/>
 
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="horizontal"
-        android:layout_marginTop="20dp">
+        android:layout_marginTop="15dp">
 
         <Button
             android:id="@+id/btnCancelAddBin"
-            style="@style/Widget.AppCompat.Button.Colored"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginRight="15dp"
             android:layout_weight="1"
-            android:background="@color/colorAccent"
+            android:backgroundTint="@color/colorSecondary"
             android:text="@string/btnCancelTxt"
             android:textColor="#ffffff" />
 
         <Button
             android:id="@+id/btnSubmitBin"
-            style="@style/Widget.AppCompat.Button.Colored"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:background="#3ED1B0"
             android:text="@string/submit"
-            android:textColor="#ffffff" />
+            android:textColor="#ffffff"
+            android:background="@color/colorPrimary"/>
     </LinearLayout>
 </LinearLayout>

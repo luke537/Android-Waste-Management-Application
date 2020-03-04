@@ -10,6 +10,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.GridLayout;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -17,6 +18,8 @@ import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.fypapplication_waster.retrofit.model.BinToBeReceived;
 import com.example.fypapplication_waster.retrofit.GetDataService;
@@ -38,6 +41,8 @@ public class RecycleFragment extends Fragment implements OnLocationUpdatedListen
     List<BinToBeReceived> matchedBins;
     Double latitude, longitude;
 
+    private List<WasteItemRecyclerViewItem> wasteItemList = null;
+
     private final static String TAG = "RecycleFragment";
     public final static int MY_PERMISSIONS_REQUEST_LOCATION = 2;
 
@@ -46,33 +51,60 @@ public class RecycleFragment extends Fragment implements OnLocationUpdatedListen
         super.onCreate(savedInstanceState);
 
         service = RetrofitUtils.getRetrofitClientInstance();
+        initializeWasteItemList();
     }
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.recycle_fragment_layout, container, false);
-        btnFindBin = rootView.findViewById(R.id.btnGlass);
+//        btnFindBin = rootView.findViewById(R.id.btnGlass);
+//
+//        btnFindBin.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//
+//                if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+//                    ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, MY_PERMISSIONS_REQUEST_LOCATION);
+//                    return;
+//                }
+//                startLocation();
+//
+//                if (latitude == null || longitude == null) {
+//                    getLastLocation();
+//                }
+//
+//                getBinsInRadiusRestCall("glass", latitude, longitude);
+//            }
+//        });
 
-        btnFindBin.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+        // Create the recyclerview.
+        RecyclerView wasteItemRecyclerView = (RecyclerView) rootView.findViewById(R.id.card_view_recycler_list);
+        // Create the grid layout manager with 2 columns.
+        GridLayoutManager gridLayoutManager = new GridLayoutManager(getContext(), 2);
+        // Set layout manager.
+        wasteItemRecyclerView.setLayoutManager(gridLayoutManager);
 
-                if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                    ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, MY_PERMISSIONS_REQUEST_LOCATION);
-                    return;
-                }
-                startLocation();
-
-                if (latitude == null || longitude == null) {
-                    getLastLocation();
-                }
-
-                getBinsInRadiusRestCall("glass", latitude, longitude);
-            }
-        });
+        // Create car recycler view data adapter with car item list.
+        WasteItemRecyclerViewDataAdapter wasteItemDataAdapter = new WasteItemRecyclerViewDataAdapter(wasteItemList);
+        // Set data adapter.
+        wasteItemRecyclerView.setAdapter(wasteItemDataAdapter);
 
         return rootView;
+    }
+
+    private void initializeWasteItemList()
+    {
+        if(wasteItemList == null)
+        {
+            wasteItemList = new ArrayList<WasteItemRecyclerViewItem>();
+            wasteItemList.add(new WasteItemRecyclerViewItem("Food Wrapper", R.drawable.wrapper));
+            wasteItemList.add(new WasteItemRecyclerViewItem("Plastic Bottle", R.drawable.plastic_bottle));
+            wasteItemList.add(new WasteItemRecyclerViewItem("Drink Can", R.drawable.drink_can));
+            wasteItemList.add(new WasteItemRecyclerViewItem("Chewing Gum", R.drawable.chewing_gum));
+            wasteItemList.add(new WasteItemRecyclerViewItem("Battery", R.drawable.battery));
+            wasteItemList.add(new WasteItemRecyclerViewItem("Foam Takeaway Container", R.drawable.styrofoam_container));
+        }
     }
 
 

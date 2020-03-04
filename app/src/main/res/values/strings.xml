@@ -22,6 +22,8 @@
     <string name="plastic">Plastic</string>
     <string name="metal">Metal</string>
     <string name="submit">Submit</string>
+    <string name="drag_marker_to_change_location">Hold and drag marker to change bin location</string>
+    <string name="confirm_bin_location">Confirm Bin Location</string>
 
 
     <string-array name="floor_array">
@@ -34,4 +36,6 @@
         <item>6th Floor</item>
         <item>7th Floor</item>
     </string-array>
+
+    <dimen name="bottom_nav_height">48dp</dimen>
 </resources>

@@ -18,7 +18,7 @@
         android:id="@+id/txtBinName"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textAppearance="@style/TextAppearance.AppCompat.Display1" />
+        android:textAppearance="@style/TextAppearance.AppCompat.Display1"/>
 
     <TextView
         android:id="@+id/txtBinMaterialsLabel"
@@ -51,21 +51,17 @@
 
         <Button
             android:id="@+id/btnCancelBinInfoModal"
-            style="@style/Widget.AppCompat.Button.Colored"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:background="@color/colorAccent"
             android:text="@string/btnCancelTxt"
             android:textColor="#ffffff" />
 
         <Button
             android:id="@+id/btnDirections"
-            style="@style/Widget.AppCompat.Button.Colored"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:background="@color/colorPrimary"
             android:text="@string/btnDirectionsTxt"
             android:textColor="#ffffff" />
     </LinearLayout>
