@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "33510907151",
+    "firebase_url": "https://bin-image-storage.firebaseio.com",
+    "project_id": "bin-image-storage",
+    "storage_bucket": "bin-image-storage.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:33510907151:android:25da8708762578db30727a",
+        "android_client_info": {
+          "package_name": "com.example.fypapplication_waster"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "33510907151-nuqdrq8f3nivs1f6qmmf201b9snid74d.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCBlTEGAzKFl4qOMLHwoYStiSu8pJk_a4s"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "33510907151-nuqdrq8f3nivs1f6qmmf201b9snid74d.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

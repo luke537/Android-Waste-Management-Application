@@ -1,9 +1,11 @@
 package com.example.fypapplication_waster;
 
 import android.Manifest;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Build;
@@ -11,6 +13,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.text.TextUtils;
+import android.util.Base64;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -33,14 +36,12 @@ import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
 import androidx.fragment.app.Fragment;
 
-import com.cloudinary.Cloudinary;
-import com.cloudinary.android.MediaManager;
-import com.cloudinary.android.policy.TimeWindow;
-import com.cloudinary.utils.ObjectUtils;
 import com.example.fypapplication_waster.retrofit.model.BinToBeReceived;
 import com.example.fypapplication_waster.retrofit.GetDataService;
 import com.example.fypapplication_waster.retrofit.model.BinToBeSent;
+import com.example.fypapplication_waster.util.FirebaseUtils;
 import com.example.fypapplication_waster.util.RetrofitUtils;
+import com.google.android.gms.auth.api.signin.internal.Storage;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -48,9 +49,15 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -552,7 +559,7 @@ public class AllBinsMapFragment extends Fragment implements OnMapReadyCallback, 
                 photoUri = FileProvider.getUriForFile(getContext(),
                         "com.example.fypapplication_waster.fileprovider",
                         photoFile);
-//                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
+                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoUri);
                 startActivityForResult(takePictureIntent, REQUEST_TAKE_PHOTO);
             }
         }
@@ -564,31 +571,53 @@ public class AllBinsMapFragment extends Fragment implements OnMapReadyCallback, 
 
         if (requestCode == REQUEST_TAKE_PHOTO) {
             if (resultCode == RESULT_OK) {
-                //File to upload to cloudinary
-//                Map config = new HashMap();
-//                config.put("cloud_name", "wasterimgdb");
-//                config.put("api_key", "928464184197124");
-//                config.put("api_secret", "Ax9-B9bxCgiy5LgGzuSiUF1iZ7c");
-//                Cloudinary cloudinary = new Cloudinary(config);
-//                try {
-//                    uploadedPhotoInfo = cloudinary.uploader().upload(photoFile.getAbsolutePath(), ObjectUtils.emptyMap());
-//                } catch (IOException e) {
-//                    e.printStackTrace();
-//                }
+//                Uri file = Uri.fromFile(photoFile);
 
-                String requestId = MediaManager.get().upload(photoUri).unsigned("zjxhx6xz").option("resource_type", "auto").dispatch();
+                Bitmap imageBitmap = null;
+                try {
+                    imageBitmap = MediaStore.Images.Media.getBitmap(getActivity().getContentResolver(), photoUri);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
 
-//                String requestId = MediaManager.get().upload(photoUri)
-//                        .unsigned("zjxhx6xz")
-//                        .constrain(TimeWindow.immediate())
-//                        .option("public_id", "my_picture")
-//                        .dispatch();
+                byte[] encodedBitmap = getEncodedBitmap(imageBitmap);
+
+                FirebaseStorage storage = FirebaseUtils.getFirebaseStorageInstance();
+                StorageReference storageRef = storage.getReference();
+
+                StorageReference binRef = storageRef.child("images/"+photoUri.getLastPathSegment());
+                UploadTask uploadTask = binRef.putBytes(encodedBitmap);
+
+                // Register observers to listen for when the download is done or if it fails
+                uploadTask.addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception exception) {
+                        // Handle unsuccessful uploads
+                        Log.d(TAG, "NO SUCCESS");
+                    }
+                }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                    @Override
+                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                        // taskSnapshot.getMetadata() contains file metadata such as size, content-type, etc.
+                        // ...
+                        Log.d(TAG, "GREAT SUCCESS");
+                    }
+                });
+
 
             } else if (resultCode == RESULT_CANCELED) {
                 // User cancelled the image capture
                 //finish();
             }
         }
+    }
+
+    public byte[] getEncodedBitmap(Bitmap bitmap) {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+        byte[] data = baos.toByteArray();
+
+        return data;
     }
 
 //    private File createImageFile() throws IOException {

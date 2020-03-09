@@ -1,4 +1,5 @@
 apply plugin: 'com.android.application'
+apply plugin: 'com.google.gms.google-services'
 
 android {
     compileSdkVersion 29
@@ -48,6 +49,6 @@ dependencies {
     implementation 'io.nlopez.smartlocation:library:3.3.3'
     implementation "androidx.cardview:cardview:1.0.0"
 
-    implementation group: 'com.cloudinary', name: 'cloudinary-android', version: '1.26.0'
-    //Front-End Libraries:
+    implementation 'com.google.firebase:firebase-auth:19.2.0'
+    implementation 'com.google.firebase:firebase-storage:19.1.1'
 }
