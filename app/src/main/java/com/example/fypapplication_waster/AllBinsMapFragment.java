@@ -1,11 +1,13 @@
 package com.example.fypapplication_waster;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Build;
@@ -22,6 +24,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RadioGroup;
 import android.widget.Spinner;
@@ -49,8 +52,11 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.tasks.Continuation;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.storage.FirebaseStorage;
@@ -90,14 +96,18 @@ import static android.content.Context.POWER_SERVICE;
 
 public class AllBinsMapFragment extends Fragment implements OnMapReadyCallback, GoogleMap.OnMarkerClickListener, OnLocationUpdatedListener, GoogleMap.OnMarkerDragListener {
 
-    SupportMapFragment mapFragment;
-    GoogleMap mMap;
+    private SupportMapFragment mapFragment;
+    private GoogleMap mMap;
 
-    GetDataService service;
-    List<BinToBeReceived> matchedBins;
-    Double latitude, longitude;
+    private GetDataService service;
+    private FirebaseStorage storage;
+    private List<BinToBeReceived> matchedBins;
+    private Double latitude, longitude;
 
-    Double newBinLatitude, newBinLongitude;
+    private Double newBinLatitude, newBinLongitude;
+    private StorageReference newBinStorageRef;
+
+    byte[] retrievedBinImageStream;
 
     private final static String TAG = "AllBinsMapFragment";
     public final static int MY_PERMISSIONS_REQUEST_LOCATION = 1;
@@ -107,10 +117,15 @@ public class AllBinsMapFragment extends Fragment implements OnMapReadyCallback, 
     private ExtendedFloatingActionButton btnAddBin;
     private ExtendedFloatingActionButton btnConfirmBinLocation;
 
+    ImageView binImgView;
+
+    private Uri firebaseBinImgDownloadUri;
+
     @Override
     public void onCreate(Bundle bundle) {
         super.onCreate(bundle);
         service = RetrofitUtils.getRetrofitClientInstance();
+        storage = FirebaseUtils.getFirebaseStorageInstance();
 
         if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, MY_PERMISSIONS_REQUEST_LOCATION);
@@ -236,7 +251,6 @@ public class AllBinsMapFragment extends Fragment implements OnMapReadyCallback, 
                 }
                 return;
 
-
         }
     }
 
@@ -303,6 +317,11 @@ public class AllBinsMapFragment extends Fragment implements OnMapReadyCallback, 
     @Override
     public boolean onMarkerClick(final Marker marker) {
 
+        // For getting the bin's image:
+        // 1. Retrieve the reference to the Firebase image from the bin's photo attribute
+        // 2. Create a Firebase reference using StorageReference etc. from the retrieved photo reference
+        // 3. use the getBytes() method from the storage reference object
+
         // Retrieve the data from the marker.
         BinToBeReceived bin = (BinToBeReceived) marker.getTag();
 
@@ -312,13 +331,17 @@ public class AllBinsMapFragment extends Fragment implements OnMapReadyCallback, 
             final TextView mBinName = (TextView) mView.findViewById(R.id.txtBinName);
             final TextView mBinMaterials = (TextView) mView.findViewById(R.id.txtBinMaterials);
             final TextView mBinComments = (TextView) mView.findViewById(R.id.txtBinComments);
-//            final ImageView binImg = mView.findViewById(R.id.imgBinPic);
-//
-//            String encodedImage = bin.getPhoto();
-//            byte[] decodedString = Base64.decode(encodedImage, Base64.DEFAULT);
+            binImgView = mView.findViewById(R.id.imgBinPic);
+
+            StorageReference binImgRef = storage.getReferenceFromUrl(bin.getPhoto());
+//            StorageReference binImgStorageRef = storageRef.child("images/JPEG_20200310_194858_2386406008949690276.jpg");
+
+            downloadEncodedBitmapFromFirebase(binImgRef);
+
+//            byte[] decodedString = Base64.decode(retrievedBinImageStream, Base64.DEFAULT);
 //            Bitmap decodedByte = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
 //
-//            binImg.setImageBitmap(decodedByte);
+//            binImgView.setImageBitmap(decodedByte);
 
             mBinName.setText(bin.getName());
 
@@ -507,7 +530,7 @@ public class AllBinsMapFragment extends Fragment implements OnMapReadyCallback, 
 
                     // POST bin to server
                     Call<ResponseBody> call = service.addBin(new BinToBeSent(binName.getText().toString(), newBinLatitude, newBinLongitude,
-                            null, materials,
+                            newBinStorageRef.toString(), materials,
                             null, null, Double.valueOf(binPrice.getText().toString()),
                             null, isInside, buildingName, buildingFloor));
 
@@ -571,8 +594,6 @@ public class AllBinsMapFragment extends Fragment implements OnMapReadyCallback, 
 
         if (requestCode == REQUEST_TAKE_PHOTO) {
             if (resultCode == RESULT_OK) {
-//                Uri file = Uri.fromFile(photoFile);
-
                 Bitmap imageBitmap = null;
                 try {
                     imageBitmap = MediaStore.Images.Media.getBitmap(getActivity().getContentResolver(), photoUri);
@@ -581,35 +602,57 @@ public class AllBinsMapFragment extends Fragment implements OnMapReadyCallback, 
                 }
 
                 byte[] encodedBitmap = getEncodedBitmap(imageBitmap);
-
-                FirebaseStorage storage = FirebaseUtils.getFirebaseStorageInstance();
-                StorageReference storageRef = storage.getReference();
-
-                StorageReference binRef = storageRef.child("images/"+photoUri.getLastPathSegment());
-                UploadTask uploadTask = binRef.putBytes(encodedBitmap);
-
-                // Register observers to listen for when the download is done or if it fails
-                uploadTask.addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception exception) {
-                        // Handle unsuccessful uploads
-                        Log.d(TAG, "NO SUCCESS");
-                    }
-                }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                    @Override
-                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                        // taskSnapshot.getMetadata() contains file metadata such as size, content-type, etc.
-                        // ...
-                        Log.d(TAG, "GREAT SUCCESS");
-                    }
-                });
-
+                newBinStorageRef = uploadEncodedImageToFirebase(encodedBitmap);
 
             } else if (resultCode == RESULT_CANCELED) {
                 // User cancelled the image capture
                 //finish();
             }
         }
+    }
+
+    public StorageReference uploadEncodedImageToFirebase(byte[] encodedBitmap) {
+        StorageReference storageRef = storage.getReference();
+
+        StorageReference binImageRef = storageRef.child("images/"+photoUri.getLastPathSegment());
+        UploadTask uploadTask = binImageRef.putBytes(encodedBitmap);
+
+        // Register observers to listen for when the download is done or if it fails
+        uploadTask.addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception exception) {
+                Log.d(TAG, "NO SUCCESS");
+            }
+        }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+            @Override
+            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                Log.d(TAG, "GREAT SUCCESS");
+            }
+        });
+
+//        Task<Uri> urlTask = uploadTask.continueWithTask(new Continuation<UploadTask.TaskSnapshot, Task<Uri>>() {
+//            @Override
+//            public Task<Uri> then(@NonNull Task<UploadTask.TaskSnapshot> task) throws Exception {
+//                if (!task.isSuccessful()) {
+//                    throw task.getException();
+//                }
+//
+//                // Continue with the task to get the download URL
+//                return binImageRef.getDownloadUrl();
+//            }
+//        }).addOnCompleteListener(new OnCompleteListener<Uri>() {
+//            @Override
+//            public void onComplete(@NonNull Task<Uri> task) {
+//                if (task.isSuccessful()) {
+//                    firebaseBinImgDownloadUri = task.getResult();
+//                } else {
+//                    // Handle failures
+//                    // ...
+//                }
+//            }
+//        });
+
+        return binImageRef;
     }
 
     public byte[] getEncodedBitmap(Bitmap bitmap) {
@@ -620,17 +663,33 @@ public class AllBinsMapFragment extends Fragment implements OnMapReadyCallback, 
         return data;
     }
 
-//    private File createImageFile() throws IOException {
-//        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-//        String imageFileName = "1mind_" + timeStamp + ".jpg";
-//        File photo = new File(getContext().getFilesDir(),  imageFileName);
-//        return photo;
-//    }
+    public void downloadEncodedBitmapFromFirebase(StorageReference binImageRef) {
+
+        final long EIGHT_MEGABYTES = 20*(1024 * 1024);
+        binImageRef.getBytes(EIGHT_MEGABYTES).addOnSuccessListener(new OnSuccessListener<byte[]>() {
+            @Override
+            public void onSuccess(byte[] bytes) {
+                // Data for "images/island.jpg" is returns, use this as needed
+                retrievedBinImageStream = bytes;
+//                byte[] decodedString = Base64.decode(bytes, Base64.URL_SAFE);
+                Bitmap decodedByte = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+
+                binImgView.setImageBitmap(decodedByte);
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception exception) {
+                // Handle any errors
+                Log.e(TAG, "Could not retrieve bin image from Firebase");
+            }
+        });
+    }
+
     String currentPhotoPath;
 
     private File createImageFile() throws IOException {
         // Create an image file name
-        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        @SuppressLint("SimpleDateFormat") String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
         String imageFileName = "JPEG_" + timeStamp + "_";
         File storageDir = getActivity().getExternalFilesDir(Environment.DIRECTORY_PICTURES);
         File image = File.createTempFile(
