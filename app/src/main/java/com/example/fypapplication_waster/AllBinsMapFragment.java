@@ -669,9 +669,7 @@ public class AllBinsMapFragment extends Fragment implements OnMapReadyCallback, 
         binImageRef.getBytes(EIGHT_MEGABYTES).addOnSuccessListener(new OnSuccessListener<byte[]>() {
             @Override
             public void onSuccess(byte[] bytes) {
-                // Data for "images/island.jpg" is returns, use this as needed
                 retrievedBinImageStream = bytes;
-//                byte[] decodedString = Base64.decode(bytes, Base64.URL_SAFE);
                 Bitmap decodedByte = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
 
                 binImgView.setImageBitmap(decodedByte);
