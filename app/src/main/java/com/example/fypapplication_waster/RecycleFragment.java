@@ -97,13 +97,13 @@ public class RecycleFragment extends Fragment implements OnLocationUpdatedListen
     {
         if(wasteItemList == null)
         {
-            wasteItemList = new ArrayList<WasteItemRecyclerViewItem>();
-            wasteItemList.add(new WasteItemRecyclerViewItem("Food Wrapper", R.drawable.wrapper));
-            wasteItemList.add(new WasteItemRecyclerViewItem("Plastic Bottle", R.drawable.plastic_bottle));
-            wasteItemList.add(new WasteItemRecyclerViewItem("Drink Can", R.drawable.drink_can));
-            wasteItemList.add(new WasteItemRecyclerViewItem("Chewing Gum", R.drawable.chewing_gum));
-            wasteItemList.add(new WasteItemRecyclerViewItem("Battery", R.drawable.battery));
-            wasteItemList.add(new WasteItemRecyclerViewItem("Foam Takeaway Container", R.drawable.styrofoam_container));
+//            wasteItemList = new ArrayList<WasteItemRecyclerViewItem>();
+//            wasteItemList.add(new WasteItemRecyclerViewItem("Food Wrapper", R.drawable.wrapper));
+//            wasteItemList.add(new WasteItemRecyclerViewItem("Plastic Bottle", R.drawable.plastic_bottle));
+//            wasteItemList.add(new WasteItemRecyclerViewItem("Drink Can", R.drawable.drink_can));
+//            wasteItemList.add(new WasteItemRecyclerViewItem("Chewing Gum", R.drawable.chewing_gum));
+//            wasteItemList.add(new WasteItemRecyclerViewItem("Battery", R.drawable.battery));
+//            wasteItemList.add(new WasteItemRecyclerViewItem("Foam Takeaway Container", R.drawable.styrofoam_container));
         }
     }
 

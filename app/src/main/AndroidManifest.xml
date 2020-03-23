@@ -27,7 +27,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:usesCleartextTraffic="true"
-        tools:replace="android:icon">
+        tools:replace="android:icon"
+        >
 
         <uses-library android:name="com.google.android.maps" />
 

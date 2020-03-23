@@ -2,6 +2,7 @@ package com.example.fypapplication_waster;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -16,6 +17,7 @@ import android.os.Environment;
 import android.provider.MediaStore;
 import android.text.TextUtils;
 import android.util.Base64;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -38,6 +40,8 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 
 import com.example.fypapplication_waster.retrofit.model.BinToBeReceived;
 import com.example.fypapplication_waster.retrofit.GetDataService;
@@ -312,16 +316,13 @@ public class AllBinsMapFragment extends Fragment implements OnMapReadyCallback, 
         Marker marker = mMap.addMarker(new MarkerOptions().draggable(true).position(latLng).title(getResources().getString(R.string.drag_marker_to_change_location)));
         marker.showInfoWindow();
         zoomInOnMarker(latLng);
+
+        newBinLatitude = marker.getPosition().latitude;
+        newBinLongitude = marker.getPosition().longitude;
     }
 
     @Override
     public boolean onMarkerClick(final Marker marker) {
-
-        // For getting the bin's image:
-        // 1. Retrieve the reference to the Firebase image from the bin's photo attribute
-        // 2. Create a Firebase reference using StorageReference etc. from the retrieved photo reference
-        // 3. use the getBytes() method from the storage reference object
-
         // Retrieve the data from the marker.
         BinToBeReceived bin = (BinToBeReceived) marker.getTag();
 
@@ -430,136 +431,153 @@ public class AllBinsMapFragment extends Fragment implements OnMapReadyCallback, 
     }
 
     private void createAddBinModal() {
-        AlertDialog.Builder mBuilder = new AlertDialog.Builder(getContext());
-        View mView = getLayoutInflater().inflate(R.layout.add_bin_modal, null);
+        FragmentTransaction fragmentTransaction = getChildFragmentManager().beginTransaction();
 
-        final TextView binName = mView.findViewById(R.id.txtBinName);
-        final CheckBox cbxGlass = mView.findViewById(R.id.cbxGlass);
-        final CheckBox cbxPlastic = mView.findViewById(R.id.cbxPlastic);
-        final CheckBox cbxMetal = mView.findViewById(R.id.cbxMetal);
+        Fragment prevDialog = getFragmentManager().findFragmentByTag("dialog");
+        if (prevDialog != null) {
+            fragmentTransaction.remove(prevDialog);
+        }
+        fragmentTransaction.addToBackStack(null);
 
-        // TODO set bin lat and long to be marker lat and long
-        newBinLatitude = latitude;
-        newBinLongitude = longitude;
+        AddBinDialogFragment addBinDialogFragment = new AddBinDialogFragment();
 
-        Spinner spinner = mView.findViewById(R.id.spinner);
-        // Create an ArrayAdapter using the string array andAsy a default spinner layout
-        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(getContext(),
-                R.array.floor_array, android.R.layout.simple_spinner_item);
-        // Specify the layout to use when the list of choices appears
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        // Apply the adapter to the spinner
-        spinner.setAdapter(adapter);
+        Bundle argsBundle = new Bundle(2);
+        argsBundle.putDouble("latitude", newBinLatitude);
+        argsBundle.putDouble("longitude", newBinLongitude);
+        addBinDialogFragment.setArguments(argsBundle);
 
-        LinearLayout binAccessLayout = mView.findViewById(R.id.linearLayoutBinAccess);
+        addBinDialogFragment.show(fragmentTransaction, "dialog");
 
-        EditText txtBuildingName = mView.findViewById(R.id.txtBuildingName);
-
-        RadioGroup radioGroup = (RadioGroup) mView.findViewById(R.id.accessibilityRadioGroup);
-        radioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(RadioGroup group, int checkedId) {
-                // checkedId is the RadioButton selected
-                if (checkedId == R.id.accessRadioBtnInside) {
-                    binAccessLayout.setVisibility(View.VISIBLE);
-                }
-                else {
-                    if (binAccessLayout.getVisibility() != View.GONE) {
-                        binAccessLayout.setVisibility(View.GONE);
-                    }
-                }
-            }
-        });
-
-
-        final EditText binPrice = mView.findViewById(R.id.txtPrice);
-
-        mBuilder.setView(mView);
-        dialog = mBuilder.create();
-
-        Button btnTakePhoto = mView.findViewById(R.id.btnTakePhoto);
-        btnTakePhoto.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
-                    ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.CAMERA}, MY_PERMISSIONS_REQUEST_CAMERA);
-                    return;
-                }
-                dispatchTakePictureIntent();
-            }
-        });
-
-        Button btnCancel = mView.findViewById(R.id.btnCancelAddBin);
-        btnCancel.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                dialog.cancel();
-                dialog.dismiss();
-            }
-        });
-
-        Button btnSubmit = mView.findViewById(R.id.btnSubmitBin);
-        btnSubmit.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-
-                // Validate fields
-                if (!TextUtils.isEmpty(binName.getText()) && !TextUtils.isEmpty(binPrice.getText())) {
-                    ArrayList materials = new ArrayList<>();
-
-                    if (cbxGlass.isChecked()) { materials.add("glass"); }
-                    if (cbxMetal.isChecked()) { materials.add("metal"); }
-                    if (cbxPlastic.isChecked()) { materials.add("plastic"); }
-
-                    boolean isInside;
-                    String buildingFloor;
-                    String buildingName;
-
-                    //check radio buttons
-                    if (radioGroup.getCheckedRadioButtonId() == R.id.accessRadioBtnInside) {
-                        isInside = true;
-                        buildingFloor = spinner.getSelectedItem().toString();
-                        buildingName = txtBuildingName.getText().toString();
-                    }
-                    else {
-                        isInside = false;
-                        buildingFloor = null;
-                        buildingName = null;
-                    }
-
-                    // POST bin to server
-                    Call<ResponseBody> call = service.addBin(new BinToBeSent(binName.getText().toString(), newBinLatitude, newBinLongitude,
-                            newBinStorageRef.toString(), materials,
-                            null, null, Double.valueOf(binPrice.getText().toString()),
-                            null, isInside, buildingName, buildingFloor));
-
-                    call.enqueue(new Callback<ResponseBody>() {
-                        @Override
-                        public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                            Log.d("MapsActivity -> Add", response.message());
-                            dialog.dismiss();
-                            if (response.isSuccessful()) {
-                                Toast.makeText(getContext(), "Bin added successfully!", Toast.LENGTH_SHORT).show();
-                                Log.d("AddBinActivity", "Bin Added Successfully");
-                            }
-                        }
-
-                        @Override
-                        public void onFailure(Call<ResponseBody> call, Throwable t) {
-                            Toast.makeText(getContext(), "Something went wrong...Please try later!", Toast.LENGTH_SHORT).show();
-                            Log.e("AddBinActivity", "Connection Failed\n" + t.getMessage());
-                        }
-                    });
-                }
-
-                else {
-                    Toast.makeText(getContext(), "Something went wrong...Please try later!", Toast.LENGTH_SHORT).show();
-                }
-            }
-        });
-
-        dialog.show();
+//        AlertDialog.Builder mBuilder = new AlertDialog.Builder(getContext());
+//        View mView = getLayoutInflater().inflate(R.layout.add_bin_modal, null);
+//
+//        final TextView binName = mView.findViewById(R.id.txtBinName);
+//        final CheckBox cbxGlass = mView.findViewById(R.id.cbxGlass);
+//        final CheckBox cbxPlastic = mView.findViewById(R.id.cbxPlastic);
+//        final CheckBox cbxMetal = mView.findViewById(R.id.cbxMetal);
+//
+//        // TODO set bin lat and long to be marker lat and long
+//        newBinLatitude = latitude;
+//        newBinLongitude = longitude;
+//
+//        Spinner spinner = mView.findViewById(R.id.spinner);
+//        // Create an ArrayAdapter using the string array andAsy a default spinner layout
+//        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(getContext(),
+//                R.array.floor_array, android.R.layout.simple_spinner_item);
+//        // Specify the layout to use when the list of choices appears
+//        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+//        // Apply the adapter to the spinner
+//        spinner.setAdapter(adapter);
+//
+//        LinearLayout binAccessLayout = mView.findViewById(R.id.linearLayoutBinAccess);
+//
+//        EditText txtBuildingName = mView.findViewById(R.id.txtBuildingName);
+//
+//        RadioGroup radioGroup = (RadioGroup) mView.findViewById(R.id.accessibilityRadioGroup);
+//        radioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+//            @Override
+//            public void onCheckedChanged(RadioGroup group, int checkedId) {
+//                // checkedId is the RadioButton selected
+//                if (checkedId == R.id.accessRadioBtnInside) {
+//                    binAccessLayout.setVisibility(View.VISIBLE);
+//                }
+//                else {
+//                    if (binAccessLayout.getVisibility() != View.GONE) {
+//                        binAccessLayout.setVisibility(View.GONE);
+//                    }
+//                }
+//            }
+//        });
+//
+//
+//        final EditText binPrice = mView.findViewById(R.id.txtPrice);
+//
+//        mBuilder.setView(mView);
+//        dialog = mBuilder.create();
+//
+//        Button btnTakePhoto = mView.findViewById(R.id.btnTakePhoto);
+//        btnTakePhoto.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+//                    ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.CAMERA}, MY_PERMISSIONS_REQUEST_CAMERA);
+//                    return;
+//                }
+//                dispatchTakePictureIntent();
+//            }
+//        });
+//
+//        Button btnCancel = mView.findViewById(R.id.btnCancelAddBin);
+//        btnCancel.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                dialog.cancel();
+//                dialog.dismiss();
+//            }
+//        });
+//
+//        Button btnSubmit = mView.findViewById(R.id.btnSubmitBin);
+//        btnSubmit.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//
+//
+//                // Validate fields
+//                if (!TextUtils.isEmpty(binName.getText()) && !TextUtils.isEmpty(binPrice.getText())) {
+//                    ArrayList materials = new ArrayList<>();
+//
+//                    if (cbxGlass.isChecked()) { materials.add("glass"); }
+//                    if (cbxMetal.isChecked()) { materials.add("metal"); }
+//                    if (cbxPlastic.isChecked()) { materials.add("plastic"); }
+//
+//                    boolean isInside;
+//                    String buildingFloor;
+//                    String buildingName;
+//
+//                    //check radio buttons
+//                    if (radioGroup.getCheckedRadioButtonId() == R.id.accessRadioBtnInside) {
+//                        isInside = true;
+//                        buildingFloor = spinner.getSelectedItem().toString();
+//                        buildingName = txtBuildingName.getText().toString();
+//                    }
+//                    else {
+//                        isInside = false;
+//                        buildingFloor = null;
+//                        buildingName = null;
+//                    }
+//
+//                    // POST bin to server
+//                    Call<ResponseBody> call = service.addBin(new BinToBeSent(binName.getText().toString(), newBinLatitude, newBinLongitude,
+//                            newBinStorageRef.toString(), materials,
+//                            null, null, Double.valueOf(binPrice.getText().toString()),
+//                            null, isInside, buildingName, buildingFloor));
+//
+//                    call.enqueue(new Callback<ResponseBody>() {
+//                        @Override
+//                        public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+//                            Log.d("MapsActivity -> Add", response.message());
+//                            dialog.dismiss();
+//                            if (response.isSuccessful()) {
+//                                Toast.makeText(getContext(), "Bin added successfully!", Toast.LENGTH_SHORT).show();
+//                                Log.d("AddBinActivity", "Bin Added Successfully");
+//                            }
+//                        }
+//
+//                        @Override
+//                        public void onFailure(Call<ResponseBody> call, Throwable t) {
+//                            Toast.makeText(getContext(), "Something went wrong...Please try later!", Toast.LENGTH_SHORT).show();
+//                            Log.e("AddBinActivity", "Connection Failed\n" + t.getMessage());
+//                        }
+//                    });
+//                }
+//
+//                else {
+//                    Toast.makeText(getContext(), "Something went wrong...Please try later!", Toast.LENGTH_SHORT).show();
+//                }
+//            }
+//        });
+//
+//        dialog.show();
     }
 
     File photoFile;
