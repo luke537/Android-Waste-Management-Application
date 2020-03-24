@@ -11,7 +11,7 @@
         android:layout_width="match_parent"
         android:layout_height="200dp"
         android:contentDescription="@string/desc_a_picture_of_the_selected_bin"
-        android:scaleType="fitCenter"
+        android:scaleType="fitXY"
         app:srcCompat="@drawable/amu_bubble_shadow" />
 
     <TextView

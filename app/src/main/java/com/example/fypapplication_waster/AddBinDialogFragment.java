@@ -1,19 +1,13 @@
 package com.example.fypapplication_waster;
-
-import android.Manifest;
 import android.app.Dialog;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
-import android.provider.MediaStore;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.WindowManager;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -26,27 +20,19 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
-import androidx.core.content.FileProvider;
 import androidx.fragment.app.DialogFragment;
 
-import com.example.fypapplication_waster.retrofit.model.BinToBeSent;
 import com.example.fypapplication_waster.util.CameraUtils;
+import com.example.fypapplication_waster.util.FirebaseUtils;
+import com.example.fypapplication_waster.util.RetrofitUtils;
+import com.google.firebase.storage.StorageReference;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
-
-import okhttp3.ResponseBody;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
-
 
 public class AddBinDialogFragment extends DialogFragment {
     private Double newBinLatitude, newBinLongitude;
     private Uri photoUri;
+    private StorageReference binImgStorageRef;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -99,15 +85,11 @@ public class AddBinDialogFragment extends DialogFragment {
 
         final EditText binPrice = rootView.findViewById(R.id.txtPrice);
 
-//        mBuilder.setView(rootView);
-//        dialog = mBuilder.create();
-
         Button btnTakePhoto = rootView.findViewById(R.id.btnTakePhoto);
         btnTakePhoto.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                dispatchTakePictureIntentAndGetUri();
-            }
+                photoUri = CameraUtils.dispatchTakePictureIntentAndGetUri(AddBinDialogFragment.this);            }
         });
 
         Button btnCancel = rootView.findViewById(R.id.btnCancelAddBin);
@@ -124,6 +106,9 @@ public class AddBinDialogFragment extends DialogFragment {
             public void onClick(View v) {
                 // Validate fields
                 if (!TextUtils.isEmpty(binName.getText()) && !TextUtils.isEmpty(binPrice.getText())) {
+                    String hours = "";
+                    String owner = null;
+
                     ArrayList materials = new ArrayList<>();
 
                     if (cbxGlass.isChecked()) { materials.add("glass"); }
@@ -147,9 +132,19 @@ public class AddBinDialogFragment extends DialogFragment {
                     }
 
                     // POST bin to server
+//                    String name, Double latitude,
+//                            Double longitude, String firebaseImgRef, ArrayList materials,
+//                            String owner, Double price, String hours, boolean isInside, String buildingName,
+//                            String buildingFloor
+                    RetrofitUtils.addBin(AddBinDialogFragment.this, binName.getText().toString(), newBinLatitude, newBinLongitude,
+                            binImgStorageRef.toString(), materials, owner,
+                            Double.valueOf(binPrice.getText().toString()),
+                            hours, isInside, buildingName, buildingFloor);
+
 //                    Call<ResponseBody> call = service.addBin(new BinToBeSent(binName.getText().toString(), newBinLatitude, newBinLongitude,
-//                            newBinStorageRef.toString(), materials,
-//                            null, null, Double.valueOf(binPrice.getText().toString()),
+//                            newBinStorageRef.toString(), materials,import android.view.WindowManager;
+
+//                            owner, null, Double.valueOf(binPrice.getText().toString()),
 //                            null, isInside, buildingName, buildingFloor));
 //
 //                    call.enqueue(new Callback<ResponseBody>() {
@@ -197,11 +192,6 @@ public class AddBinDialogFragment extends DialogFragment {
         CameraUtils.onRequestPermissionsResult(this, requestCode, permissions, grantResults);
     }
 
-    private Uri dispatchTakePictureIntentAndGetUri() {
-        photoUri = CameraUtils.dispatchTakePictureIntentAndGetUri(this);
-        return photoUri;
-    }
-
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -209,10 +199,8 @@ public class AddBinDialogFragment extends DialogFragment {
         Bitmap imageBitmap = CameraUtils.onCameraActivityResult(this, requestCode, resultCode, data, photoUri);
 
         if (imageBitmap != null) { // user has not cancelled image capture
-             // do Firebase upload stuff with picture
-            // TODO refactor Firebase stuff into utils
-//            byte[] encodedBitmap = getEncodedBitmap(imageBitmap);
-//            newBinStorageRef = uploadEncodedImageToFirebase(encodedBitmap);
+             // Upload Bitmap to Firebase and get its storage reference
+            binImgStorageRef = FirebaseUtils.encodeBitmapAndUploadToFirebase(this, imageBitmap, photoUri);
         }
     }
 

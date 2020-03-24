@@ -1,11 +1,7 @@
 package com.example.fypapplication_waster;
 
 import android.Manifest;
-import android.annotation.SuppressLint;
-import android.app.Dialog;
-import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -13,42 +9,25 @@ import android.location.Location;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
-import android.provider.MediaStore;
-import android.text.TextUtils;
-import android.util.Base64;
-import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.CheckBox;
-import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.RadioGroup;
-import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
-import androidx.core.content.FileProvider;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
-
 import com.example.fypapplication_waster.retrofit.model.BinToBeReceived;
 import com.example.fypapplication_waster.retrofit.GetDataService;
-import com.example.fypapplication_waster.retrofit.model.BinToBeSent;
 import com.example.fypapplication_waster.util.FirebaseUtils;
 import com.example.fypapplication_waster.util.RetrofitUtils;
-import com.google.android.gms.auth.api.signin.internal.Storage;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -56,39 +35,17 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.gms.tasks.Continuation;
-import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
-import com.google.firebase.storage.UploadTask;
-
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-
 import io.nlopez.smartlocation.OnLocationUpdatedListener;
 import io.nlopez.smartlocation.SmartLocation;
-import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
-
-import static android.app.Activity.RESULT_CANCELED;
-import static android.app.Activity.RESULT_OK;
-import static android.content.Context.POWER_SERVICE;
 
 /**
  * This fragment displays a map showing all bins within a specifc radius of the user's current location
@@ -109,13 +66,11 @@ public class AllBinsMapFragment extends Fragment implements OnMapReadyCallback, 
     private Double latitude, longitude;
 
     private Double newBinLatitude, newBinLongitude;
-    private StorageReference newBinStorageRef;
 
     byte[] retrievedBinImageStream;
 
     private final static String TAG = "AllBinsMapFragment";
     public final static int MY_PERMISSIONS_REQUEST_LOCATION = 1;
-    public final static int MY_PERMISSIONS_REQUEST_CAMERA = 2;
 
     private AlertDialog dialog;
     private ExtendedFloatingActionButton btnAddBin;
@@ -140,8 +95,6 @@ public class AllBinsMapFragment extends Fragment implements OnMapReadyCallback, 
         if (latitude == null || longitude == null) {
             getLastLocation();
         }
-
-        Log.d(TAG, "onCreate()");
     }
 
     @Nullable
@@ -176,7 +129,6 @@ public class AllBinsMapFragment extends Fragment implements OnMapReadyCallback, 
     @Override
     public void onResume() {
         super.onResume();
-        Log.d(TAG, "onResume()");
         setUpMapIfNeeded();
     }
 
@@ -205,8 +157,7 @@ public class AllBinsMapFragment extends Fragment implements OnMapReadyCallback, 
     }
 
     @Override
-    public void onMapReady(GoogleMap googleMap)
-    {
+    public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
 
         //Initialize Google Play Services
@@ -222,7 +173,6 @@ public class AllBinsMapFragment extends Fragment implements OnMapReadyCallback, 
         // Set a listener for marker click.
         mMap.setOnMarkerClickListener(this);
         mMap.setOnMarkerDragListener(this);
-
     }
 
 
@@ -245,16 +195,7 @@ public class AllBinsMapFragment extends Fragment implements OnMapReadyCallback, 
                 } else {
                     Toast.makeText(getActivity(), "permission denied", Toast.LENGTH_LONG).show();
                 }
-                return;
             }
-            case MY_PERMISSIONS_REQUEST_CAMERA:
-                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    dispatchTakePictureIntent();
-                } else {
-                    Toast.makeText(getActivity(), "permission denied", Toast.LENGTH_LONG).show();
-                }
-                return;
-
         }
     }
 
@@ -269,7 +210,6 @@ public class AllBinsMapFragment extends Fragment implements OnMapReadyCallback, 
                     Log.d(TAG, "Successful response getting bins");
                     matchedBins = response.body();
 
-                    // TODO put the stuff I want to happen after GET request here
                     if (matchedBins != null && matchedBins.size() > 0 && mMap != null) {
                         drawBinsOnMap();
                     }
@@ -335,14 +275,7 @@ public class AllBinsMapFragment extends Fragment implements OnMapReadyCallback, 
             binImgView = mView.findViewById(R.id.imgBinPic);
 
             StorageReference binImgRef = storage.getReferenceFromUrl(bin.getPhoto());
-//            StorageReference binImgStorageRef = storageRef.child("images/JPEG_20200310_194858_2386406008949690276.jpg");
-
             downloadEncodedBitmapFromFirebase(binImgRef);
-
-//            byte[] decodedString = Base64.decode(retrievedBinImageStream, Base64.DEFAULT);
-//            Bitmap decodedByte = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
-//
-//            binImgView.setImageBitmap(decodedByte);
 
             mBinName.setText(bin.getName());
 
@@ -407,17 +340,12 @@ public class AllBinsMapFragment extends Fragment implements OnMapReadyCallback, 
         new AlertDialog.Builder(getContext())
                 .setTitle("Choose Bin Location")
                 .setMessage("Use your current location or choose location?")
-
-                // Specifying a listener allows you to take an action before dismissing the dialog.
-                // The dialog is automatically dismissed when a dialog button is clicked.
                 .setPositiveButton("Use my current location", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int i) {
                         // Continue with delete operation
                         createAddBinModal();
                     }
                 })
-
-                // A null listener allows the button to dismiss the dialog and take no further action.
                 .setNegativeButton("Choose location", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
@@ -447,238 +375,6 @@ public class AllBinsMapFragment extends Fragment implements OnMapReadyCallback, 
         addBinDialogFragment.setArguments(argsBundle);
 
         addBinDialogFragment.show(fragmentTransaction, "dialog");
-
-//        AlertDialog.Builder mBuilder = new AlertDialog.Builder(getContext());
-//        View mView = getLayoutInflater().inflate(R.layout.add_bin_modal, null);
-//
-//        final TextView binName = mView.findViewById(R.id.txtBinName);
-//        final CheckBox cbxGlass = mView.findViewById(R.id.cbxGlass);
-//        final CheckBox cbxPlastic = mView.findViewById(R.id.cbxPlastic);
-//        final CheckBox cbxMetal = mView.findViewById(R.id.cbxMetal);
-//
-//        // TODO set bin lat and long to be marker lat and long
-//        newBinLatitude = latitude;
-//        newBinLongitude = longitude;
-//
-//        Spinner spinner = mView.findViewById(R.id.spinner);
-//        // Create an ArrayAdapter using the string array andAsy a default spinner layout
-//        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(getContext(),
-//                R.array.floor_array, android.R.layout.simple_spinner_item);
-//        // Specify the layout to use when the list of choices appears
-//        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-//        // Apply the adapter to the spinner
-//        spinner.setAdapter(adapter);
-//
-//        LinearLayout binAccessLayout = mView.findViewById(R.id.linearLayoutBinAccess);
-//
-//        EditText txtBuildingName = mView.findViewById(R.id.txtBuildingName);
-//
-//        RadioGroup radioGroup = (RadioGroup) mView.findViewById(R.id.accessibilityRadioGroup);
-//        radioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
-//            @Override
-//            public void onCheckedChanged(RadioGroup group, int checkedId) {
-//                // checkedId is the RadioButton selected
-//                if (checkedId == R.id.accessRadioBtnInside) {
-//                    binAccessLayout.setVisibility(View.VISIBLE);
-//                }
-//                else {
-//                    if (binAccessLayout.getVisibility() != View.GONE) {
-//                        binAccessLayout.setVisibility(View.GONE);
-//                    }
-//                }
-//            }
-//        });
-//
-//
-//        final EditText binPrice = mView.findViewById(R.id.txtPrice);
-//
-//        mBuilder.setView(mView);
-//        dialog = mBuilder.create();
-//
-//        Button btnTakePhoto = mView.findViewById(R.id.btnTakePhoto);
-//        btnTakePhoto.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
-//                    ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.CAMERA}, MY_PERMISSIONS_REQUEST_CAMERA);
-//                    return;
-//                }
-//                dispatchTakePictureIntent();
-//            }
-//        });
-//
-//        Button btnCancel = mView.findViewById(R.id.btnCancelAddBin);
-//        btnCancel.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                dialog.cancel();
-//                dialog.dismiss();
-//            }
-//        });
-//
-//        Button btnSubmit = mView.findViewById(R.id.btnSubmitBin);
-//        btnSubmit.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//
-//
-//                // Validate fields
-//                if (!TextUtils.isEmpty(binName.getText()) && !TextUtils.isEmpty(binPrice.getText())) {
-//                    ArrayList materials = new ArrayList<>();
-//
-//                    if (cbxGlass.isChecked()) { materials.add("glass"); }
-//                    if (cbxMetal.isChecked()) { materials.add("metal"); }
-//                    if (cbxPlastic.isChecked()) { materials.add("plastic"); }
-//
-//                    boolean isInside;
-//                    String buildingFloor;
-//                    String buildingName;
-//
-//                    //check radio buttons
-//                    if (radioGroup.getCheckedRadioButtonId() == R.id.accessRadioBtnInside) {
-//                        isInside = true;
-//                        buildingFloor = spinner.getSelectedItem().toString();
-//                        buildingName = txtBuildingName.getText().toString();
-//                    }
-//                    else {
-//                        isInside = false;
-//                        buildingFloor = null;
-//                        buildingName = null;
-//                    }
-//
-//                    // POST bin to server
-//                    Call<ResponseBody> call = service.addBin(new BinToBeSent(binName.getText().toString(), newBinLatitude, newBinLongitude,
-//                            newBinStorageRef.toString(), materials,
-//                            null, null, Double.valueOf(binPrice.getText().toString()),
-//                            null, isInside, buildingName, buildingFloor));
-//
-//                    call.enqueue(new Callback<ResponseBody>() {
-//                        @Override
-//                        public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-//                            Log.d("MapsActivity -> Add", response.message());
-//                            dialog.dismiss();
-//                            if (response.isSuccessful()) {
-//                                Toast.makeText(getContext(), "Bin added successfully!", Toast.LENGTH_SHORT).show();
-//                                Log.d("AddBinActivity", "Bin Added Successfully");
-//                            }
-//                        }
-//
-//                        @Override
-//                        public void onFailure(Call<ResponseBody> call, Throwable t) {
-//                            Toast.makeText(getContext(), "Something went wrong...Please try later!", Toast.LENGTH_SHORT).show();
-//                            Log.e("AddBinActivity", "Connection Failed\n" + t.getMessage());
-//                        }
-//                    });
-//                }
-//
-//                else {
-//                    Toast.makeText(getContext(), "Something went wrong...Please try later!", Toast.LENGTH_SHORT).show();
-//                }
-//            }
-//        });
-//
-//        dialog.show();
-    }
-
-    File photoFile;
-    Uri photoUri;
-    public static final int REQUEST_TAKE_PHOTO = 1;
-    Map uploadedPhotoInfo;
-
-    private void dispatchTakePictureIntent() {
-        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        // Ensure that there's a camera activity to handle the intent
-        if (takePictureIntent.resolveActivity(getActivity().getPackageManager()) != null) {
-            // Create the File where the photo should go
-            try {
-                photoFile = createImageFile();
-            } catch (IOException ex) {
-                // Error occurred while creating the File
-            }
-            // Continue only if the File was successfully created
-            if (photoFile != null) {
-                photoUri = FileProvider.getUriForFile(getContext(),
-                        "com.example.fypapplication_waster.fileprovider",
-                        photoFile);
-                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoUri);
-                startActivityForResult(takePictureIntent, REQUEST_TAKE_PHOTO);
-            }
-        }
-    }
-
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-
-        if (requestCode == REQUEST_TAKE_PHOTO) {
-            if (resultCode == RESULT_OK) {
-                Bitmap imageBitmap = null;
-                try {
-                    imageBitmap = MediaStore.Images.Media.getBitmap(getActivity().getContentResolver(), photoUri);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-
-                byte[] encodedBitmap = getEncodedBitmap(imageBitmap);
-                newBinStorageRef = uploadEncodedImageToFirebase(encodedBitmap);
-
-            } else if (resultCode == RESULT_CANCELED) {
-                // User cancelled the image capture
-                //finish();
-            }
-        }
-    }
-
-    public StorageReference uploadEncodedImageToFirebase(byte[] encodedBitmap) {
-        StorageReference storageRef = storage.getReference();
-
-        StorageReference binImageRef = storageRef.child("images/"+photoUri.getLastPathSegment());
-        UploadTask uploadTask = binImageRef.putBytes(encodedBitmap);
-
-        // Register observers to listen for when the download is done or if it fails
-        uploadTask.addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception exception) {
-                Log.d(TAG, "NO SUCCESS");
-            }
-        }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-            @Override
-            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                Log.d(TAG, "GREAT SUCCESS");
-            }
-        });
-
-//        Task<Uri> urlTask = uploadTask.continueWithTask(new Continuation<UploadTask.TaskSnapshot, Task<Uri>>() {
-//            @Override
-//            public Task<Uri> then(@NonNull Task<UploadTask.TaskSnapshot> task) throws Exception {
-//                if (!task.isSuccessful()) {
-//                    throw task.getException();
-//                }
-//
-//                // Continue with the task to get the download URL
-//                return binImageRef.getDownloadUrl();
-//            }
-//        }).addOnCompleteListener(new OnCompleteListener<Uri>() {
-//            @Override
-//            public void onComplete(@NonNull Task<Uri> task) {
-//                if (task.isSuccessful()) {
-//                    firebaseBinImgDownloadUri = task.getResult();
-//                } else {
-//                    // Handle failures
-//                    // ...
-//                }
-//            }
-//        });
-
-        return binImageRef;
-    }
-
-    public byte[] getEncodedBitmap(Bitmap bitmap) {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
-        byte[] data = baos.toByteArray();
-
-        return data;
     }
 
     public void downloadEncodedBitmapFromFirebase(StorageReference binImageRef) {
@@ -700,219 +396,4 @@ public class AllBinsMapFragment extends Fragment implements OnMapReadyCallback, 
             }
         });
     }
-
-    String currentPhotoPath;
-
-    private File createImageFile() throws IOException {
-        // Create an image file name
-        @SuppressLint("SimpleDateFormat") String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-        String imageFileName = "JPEG_" + timeStamp + "_";
-        File storageDir = getActivity().getExternalFilesDir(Environment.DIRECTORY_PICTURES);
-        File image = File.createTempFile(
-                imageFileName,  /* prefix */
-                ".jpg",         /* suffix */
-                storageDir      /* directory */
-        );
-
-        // Save a file: path for use with ACTION_VIEW intents
-        currentPhotoPath = image.getAbsolutePath();
-        return image;
-    }
-
 }
-//    @Override
-//    public void onCreate(@Nullable Bundle savedInstanceState) {
-//        super.onCreate(savedInstanceState);
-//
-//        permissions.add(Manifest.permission.ACCESS_FINE_LOCATION);
-//        permissions.add(Manifest.permission.ACCESS_COARSE_LOCATION);
-//
-//        permissionsToRequest = permissionsToRequest(permissions);
-//
-//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-//            if (permissionsToRequest.size() > 0) {
-//                requestPermissions(permissionsToRequest.toArray(
-//                        new String[permissionsToRequest.size()]), ALL_PERMISSIONS_RESULT);
-//            }
-//        }
-//
-//        // we build google api client
-//        googleApiClient = new GoogleApiClient.Builder(getActivity()).
-//                addApi(LocationServices.API).
-//                addConnectionCallbacks(this).
-//                addOnConnectionFailedListener(this).build();
-//
-////        askForLocationPermissions();
-//
-//
-//    }
-//
-//    @Nullable
-//    @Override
-//    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-//        super.onCreateView(inflater, container, savedInstanceState);
-//        View rootView = inflater.inflate(R.layout.map_fragment_layout, container, false);
-//        SupportMapFragment mMapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.google_map_fragment); //this
-//        mMapFragment.getMapAsync(this); //and this are breaking location
-//
-//        return rootView;
-//    }
-//
-//    @Override
-//    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-//        super.onViewCreated(view, savedInstanceState);
-//    }
-//
-//    @Override
-//    public void onStart() {
-//        super.onStart();
-//
-//        if (googleApiClient != null) {
-//            googleApiClient.connect();
-//        }
-//    }
-//
-//    @Override
-//    public void onPause() {
-//        super.onPause();
-//
-//        if (googleApiClient != null  &&  googleApiClient.isConnected()) {
-//            LocationServices.FusedLocationApi.removeLocationUpdates(googleApiClient, this);
-//            googleApiClient.disconnect();
-//        }
-//
-//        mMapView.onResume();
-//    }
-//
-//    @Override
-//    public void onResume() {
-//        super.onResume();
-//
-//        if (!checkPlayServices()) {
-//            Toast.makeText(getActivity(), "You need to install Google Play Services to use the App properly", Toast.LENGTH_LONG);
-//        }
-//    }
-//
-//    @Override
-//    public void onDestroy() {
-//        super.onDestroy();
-//        mMapView.onDestroy();
-//    }
-//
-//    @Override
-//    public void onLowMemory() {
-//        super.onLowMemory();
-//        mMapView.onLowMemory();
-//    }
-//
-//    @Override
-//    public void onMapReady(GoogleMap googleMap) {
-//        mMap = googleMap;
-//        mMap.setMyLocationEnabled(true);
-//////        List<BinToBeReceived> bins = getBinsInRadiusRestCall(latitude, longitude);
-//////
-//////        if (bins != null) {
-//////            Log.d(TAG, String.format("Found %d bins", bins.size()));
-//////
-//////            for (Object bin : bins) {
-//////                LatLng binLatLng = new LatLng(((BinToBeReceived) bin).getLocation().getLatitude(), ((BinToBeReceived) bin).getLocation().getLongitude());
-//////                Marker marker = mMap.addMarker(new MarkerOptions().position(binLatLng).title(((BinToBeReceived) bin).getName()));
-//////                marker.setTag((BinToBeReceived) bin);
-//////                mMap.moveCamera(CameraUpdateFactory.newLatLng(binLatLng));
-//////            }
-//////
-//////            BinToBeReceived closestBin = (BinToBeReceived) bins.get(0); //bins are ordered with nearest first
-//////            LatLng closestBinLatLng = new LatLng(((BinToBeReceived) closestBin).getLocation().getLatitude(), ((BinToBeReceived) closestBin).getLocation().getLongitude());
-//////            zoomInOnMarker(closestBinLatLng);
-//////
-//////            // Set a listener for marker click.
-//////            mMap.setOnMarkerClickListener((GoogleMap.OnMarkerClickListener) this);
-//////        }
-//////
-//////        else {
-//////            Log.d(TAG, "No bins found");
-//////            Toast.makeText(getActivity(), "Unfortunately, there were no bins found in your area", Toast.LENGTH_LONG).show();
-//////        }
-////
-//        mMap.addMarker(new MarkerOptions().position(new LatLng(latitude, longitude)).title("Current Location"));
-////
-////        //TODO: Figure out what to do with add bin modal
-////
-////        // Set listener for "Add Bin" click
-//////        Button btnAddBin = findViewById(R.id.btnAddBinOnMap);
-//////        btnAddBin.setOnClickListener(new View.OnClickListener() {
-//////            @Override
-//////            public void onClick(View v) {
-//////                onAddBinBtnClick();
-//////            }
-//////        });
-//    }
-//
-//    @Override
-//    public boolean onMarkerClick(final Marker marker) {
-////
-////        // Retrieve the data from the marker.
-//////        BinToBeReceived bin = (BinToBeReceived) marker.getTag();
-//////
-//////        if (bin != null) {
-//////            AlertDialog.Builder mBuilder = new AlertDialog.Builder(getActivity());
-//////            View mView = getLayoutInflater().inflate(R.layout.bin_info_modal, null);
-//////            final TextView mBinName = (TextView) mView.findViewById(R.id.txtBinName);
-//////            final TextView mBinMaterials = (TextView) mView.findViewById(R.id.txtBinMaterials);
-//////            final TextView mBinComments = (TextView) mView.findViewById(R.id.txtBinComments);
-////////            final ImageView binImg = mView.findViewById(R.id.imgBinPic);
-////////
-////////            String encodedImage = bin.getPhoto();
-////////            byte[] decodedString = Base64.decode(encodedImage, Base64.DEFAULT);
-////////            Bitmap decodedByte = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
-////////
-////////            binImg.setImageBitmap(decodedByte);
-//////
-//////            mBinName.setText(bin.getName());
-//////
-//////            if (bin.getMaterials() != null) {
-//////                for (Object material : bin.getMaterials()) {
-//////                    mBinMaterials.append((String) material + "\n");
-//////                }
-//////            }
-//////
-//////            if (bin.getComments() != null) {
-//////                for (Object comment : bin.getComments()) {
-//////                    mBinComments.append((String) comment + "\n");
-//////                }
-//////            }
-//////
-//////
-//////            mBuilder.setView(mView);
-//////            dialog = mBuilder.create();
-//////
-//////            Button btnCancel = mView.findViewById(R.id.btnCancelBinInfoModal);
-//////            btnCancel.setOnClickListener(new View.OnClickListener() {
-//////                @Override
-//////                public void onClick(View v) {
-//////                    dialog.cancel();
-//////                    dialog.dismiss();
-//////                }
-//////            });
-//////
-//////            Button btnDirections = mView.findViewById(R.id.btnDirections);
-//////            btnDirections.setOnClickListener(new View.OnClickListener() {
-//////                @Override
-//////                public void onClick(View v) {
-//////                    //Get directions to bin
-//////                }
-//////            });
-//////
-//////            dialog.show();
-//////        }
-//        return false;
-//    }
-////
-////    private void zoomInOnMarker(LatLng location)
-////    {
-////        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(location,15));
-////        // Zoom in, animating the camera.
-////        mMap.animateCamera(CameraUpdateFactory.zoomIn());
-////        // Zoom out to zoom level 10, animating with a duration of 2 seconds.
-////        mMap.animateCamera(CameraUpdateFactory.zoomTo(15), 2000, null);
-////    }

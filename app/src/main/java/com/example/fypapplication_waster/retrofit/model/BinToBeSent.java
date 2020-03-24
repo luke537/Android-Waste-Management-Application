@@ -18,8 +18,6 @@ public class BinToBeSent {
     private ArrayList materials;
     @SerializedName("owner")
     private String owner;
-    @SerializedName("comments")
-    private ArrayList comments;
     @SerializedName("price")
     private Double price;
     @SerializedName("hours")
@@ -32,7 +30,7 @@ public class BinToBeSent {
     private String buildingFloor;
 
     public BinToBeSent(String name, Double latitude, Double longitude, String photo,
-                           ArrayList materials, String owner, ArrayList comments,
+                           ArrayList materials, String owner,
                            Double price, String hours, boolean isInside, String buildingName, String buildingFloor) {
         this.name = name;
         this.latitude = latitude;
@@ -40,7 +38,6 @@ public class BinToBeSent {
         this.photo = photo;
         this.materials = materials;
         this.owner = owner;
-        this.comments = comments;
         this.price = price;
         this.hours = hours;
         this.isInside = isInside;
@@ -94,14 +91,6 @@ public class BinToBeSent {
 
     public void setOwner(String owner) {
         this.owner = owner;
-    }
-
-    public ArrayList getComments() {
-        return comments;
-    }
-
-    public void setComments(ArrayList comments) {
-        this.comments = comments;
     }
 
     public Double getPrice() {
