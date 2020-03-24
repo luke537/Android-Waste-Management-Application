@@ -132,38 +132,10 @@ public class AddBinDialogFragment extends DialogFragment {
                     }
 
                     // POST bin to server
-//                    String name, Double latitude,
-//                            Double longitude, String firebaseImgRef, ArrayList materials,
-//                            String owner, Double price, String hours, boolean isInside, String buildingName,
-//                            String buildingFloor
                     RetrofitUtils.addBin(AddBinDialogFragment.this, binName.getText().toString(), newBinLatitude, newBinLongitude,
                             binImgStorageRef.toString(), materials, owner,
                             Double.valueOf(binPrice.getText().toString()),
                             hours, isInside, buildingName, buildingFloor);
-
-//                    Call<ResponseBody> call = service.addBin(new BinToBeSent(binName.getText().toString(), newBinLatitude, newBinLongitude,
-//                            newBinStorageRef.toString(), materials,import android.view.WindowManager;
-
-//                            owner, null, Double.valueOf(binPrice.getText().toString()),
-//                            null, isInside, buildingName, buildingFloor));
-//
-//                    call.enqueue(new Callback<ResponseBody>() {
-//                        @Override
-//                        public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-//                            Log.d("MapsActivity -> Add", response.message());
-//                            dismiss();
-//                            if (response.isSuccessful()) {
-//                                Toast.makeText(getContext(), "Bin added successfully!", Toast.LENGTH_SHORT).show();
-//                                Log.d("AddBinActivity", "Bin Added Successfully");
-//                            }
-//                        }
-//
-//                        @Override
-//                        public void onFailure(Call<ResponseBody> call, Throwable t) {
-//                            Toast.makeText(getContext(), "Something went wrong...Please try later!", Toast.LENGTH_SHORT).show();
-//                            Log.e("AddBinActivity", "Connection Failed\n" + t.getMessage());
-//                        }
-//                    });
                 }
 
                 else {
