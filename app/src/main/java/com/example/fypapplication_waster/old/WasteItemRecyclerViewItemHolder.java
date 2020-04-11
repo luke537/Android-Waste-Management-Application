@@ -1,10 +1,12 @@
-package com.example.fypapplication_waster;
+package com.example.fypapplication_waster.old;
 
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.example.fypapplication_waster.R;
 
 public class WasteItemRecyclerViewItemHolder extends RecyclerView.ViewHolder {
 

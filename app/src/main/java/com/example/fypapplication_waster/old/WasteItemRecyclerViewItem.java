@@ -1,4 +1,4 @@
-package com.example.fypapplication_waster;
+package com.example.fypapplication_waster.old;
 
 public class WasteItemRecyclerViewItem {
 

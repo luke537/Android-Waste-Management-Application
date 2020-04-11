@@ -23,6 +23,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
 
 import com.example.fypapplication_waster.util.CameraUtils;
+import com.example.fypapplication_waster.util.Constants;
 import com.example.fypapplication_waster.util.FirebaseUtils;
 import com.example.fypapplication_waster.util.RetrofitUtils;
 import com.google.firebase.storage.StorageReference;
@@ -49,10 +50,13 @@ public class AddBinDialogFragment extends DialogFragment {
         
         View rootView = inflater.inflate(R.layout.add_bin_modal, container, false);
         final TextView binName = rootView.findViewById(R.id.txtBinName);
-        final CheckBox cbxGlass = rootView.findViewById(R.id.cbxGlass);
-        final CheckBox cbxPlastic = rootView.findViewById(R.id.cbxPlastic);
-        final CheckBox cbxMetal = rootView.findViewById(R.id.cbxMetal);
-        
+        final CheckBox cbxClearGlass = rootView.findViewById(R.id.cbxClearGlass);
+        final CheckBox cbxCardboard = rootView.findViewById(R.id.cbxCardboard);
+        final CheckBox cbxAABattery = rootView.findViewById(R.id.cbxAABattery);
+        final CheckBox cbxDrinkCan = rootView.findViewById(R.id.cbxDrinkCan);
+        final CheckBox cbxPlasticBottle = rootView.findViewById(R.id.cbxPlasticBottle);
+        final CheckBox cbxPlasticFoodWrappers = rootView.findViewById(R.id.cbxPlasticFoodWrapper);
+
         Spinner spinner = rootView.findViewById(R.id.spinner);
         // Create an ArrayAdapter using the string array andAsy a default spinner layout
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(getContext(),
@@ -111,9 +115,12 @@ public class AddBinDialogFragment extends DialogFragment {
 
                     ArrayList materials = new ArrayList<>();
 
-                    if (cbxGlass.isChecked()) { materials.add("glass"); }
-                    if (cbxMetal.isChecked()) { materials.add("metal"); }
-                    if (cbxPlastic.isChecked()) { materials.add("plastic"); }
+                    if (cbxClearGlass.isChecked()) { materials.add(Constants.CLEAR_GLASS); }
+                    if (cbxCardboard.isChecked()) { materials.add(Constants.CARDBOARD); }
+                    if (cbxAABattery.isChecked()) { materials.add(Constants.AA_BATTERY); }
+                    if (cbxDrinkCan.isChecked()) { materials.add(Constants.DRINK_CAN); }
+                    if (cbxPlasticBottle.isChecked()) { materials.add(Constants.PLASTIC_BOTTLE); }
+                    if (cbxPlasticFoodWrappers.isChecked()) { materials.add(Constants.PLASTIC_FOOD_WRAPPER); }
 
                     boolean isInside;
                     String buildingFloor;

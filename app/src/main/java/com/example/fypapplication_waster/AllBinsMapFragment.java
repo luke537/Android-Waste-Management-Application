@@ -341,7 +341,9 @@ public class AllBinsMapFragment extends Fragment implements OnMapReadyCallback, 
                 .setMessage("Use your current location or choose location?")
                 .setPositiveButton("Use my current location", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int i) {
-                        // Continue with delete operation
+                        getLastLocation();
+                        newBinLatitude = latitude;
+                        newBinLongitude = longitude;
                         createAddBinModal();
                     }
                 })

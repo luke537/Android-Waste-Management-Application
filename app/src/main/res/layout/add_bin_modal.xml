@@ -41,27 +41,59 @@
         android:orientation="horizontal">
 
         <CheckBox
-            android:id="@+id/cbxGlass"
+            android:id="@+id/cbxClearGlass"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="@string/glass"
+            android:text="@string/clear_glass"
             android:buttonTint="@color/colorPrimary"/>
 
         <CheckBox
-            android:id="@+id/cbxPlastic"
+            android:id="@+id/cbxCardboard"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="@string/plastic"
+            android:text="@string/cardboard"
             android:buttonTint="@color/colorPrimary"/>
 
         <CheckBox
-            android:id="@+id/cbxMetal"
+            android:id="@+id/cbxAABattery"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="@string/metal"
+            android:text="@string/aa_battery"
+            android:buttonTint="@color/colorPrimary"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:weightSum="3">
+
+        <CheckBox
+            android:id="@+id/cbxDrinkCan"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/drink_can"
+            android:buttonTint="@color/colorPrimary"/>
+
+        <CheckBox
+            android:id="@+id/cbxPlasticBottle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/plastic_bottle"
+            android:buttonTint="@color/colorPrimary"/>
+
+        <CheckBox
+            android:id="@+id/cbxPlasticFoodWrapper"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/plastic_food_wrappers"
             android:buttonTint="@color/colorPrimary"/>
 
     </LinearLayout>

@@ -24,6 +24,13 @@
     <string name="submit">Submit</string>
     <string name="drag_marker_to_change_location">Hold and drag marker to change bin location</string>
     <string name="confirm_bin_location">Confirm Bin Location</string>
+    <string name="aa_battery">AA Battery</string>
+    <string name="cardboard">Cardboard</string>
+    <string name="clear_glass">Clear Glass</string>
+    <string name="drink_can">Drink Can</string>
+    <string name="plastic_bottle">Plastic Bottle</string>
+    <string name="plastic_food_wrappers">Plastic Food Wrappers</string>
+    <string name="plastic_overwrap_packaging">Plastic Overwrap Packaging</string>
 
 
     <string-array name="floor_array">

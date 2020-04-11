@@ -10,7 +10,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.GridLayout;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -18,11 +17,11 @@ import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.GridLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.fypapplication_waster.old.WasteItemRecyclerViewItem;
 import com.example.fypapplication_waster.retrofit.model.BinToBeReceived;
 import com.example.fypapplication_waster.retrofit.GetDataService;
+import com.example.fypapplication_waster.util.Constants;
 import com.example.fypapplication_waster.util.RetrofitUtils;
 
 import java.util.ArrayList;
@@ -60,7 +59,6 @@ public class RecycleFragment extends Fragment implements OnLocationUpdatedListen
         }
 
         service = RetrofitUtils.getRetrofitClientInstance();
-        initializeWasteItemList();
     }
 
     @Nullable
@@ -68,35 +66,56 @@ public class RecycleFragment extends Fragment implements OnLocationUpdatedListen
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.recycle_fragment_layout, container, false);
 
-        // Create the recyclerview.
-        RecyclerView wasteItemRecyclerView = (RecyclerView) rootView.findViewById(R.id.card_view_recycler_list);
-        // Create the grid layout manager with 2 columns.
-        GridLayoutManager gridLayoutManager = new GridLayoutManager(getContext(), 2);
-        // Set layout manager.
-        wasteItemRecyclerView.setLayoutManager(gridLayoutManager);
+        final Button btnFindBinAABattery = rootView.findViewById(R.id.btnFindABinAABattery);
+        btnFindBinAABattery.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                getBinsWithMaterial(Constants.AA_BATTERY, latitude, longitude);
+            }
+        });
 
-        // Create car recycler view data adapter with car item list.
-        WasteItemRecyclerViewDataAdapter wasteItemDataAdapter = new WasteItemRecyclerViewDataAdapter(wasteItemList, latitude, longitude);
-        // Set data adapter.
-        wasteItemRecyclerView.setAdapter(wasteItemDataAdapter);
+        final Button btnFindBinCardboard = rootView.findViewById(R.id.btnFindABinCardboard);
+        btnFindBinCardboard.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                getBinsWithMaterial(Constants.CARDBOARD, latitude, longitude);
+            }
+        });
+
+        final Button btnFindBinClearGlass = rootView.findViewById(R.id.btnFindABinClearGlass);
+        btnFindBinClearGlass.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                getBinsWithMaterial(Constants.CLEAR_GLASS, latitude, longitude);
+            }
+        });
+
+        final Button btnFindBinDrinkCan = rootView.findViewById(R.id.btnFindABinDrinkCan);
+        btnFindBinDrinkCan.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                getBinsWithMaterial(Constants.DRINK_CAN, latitude, longitude);
+            }
+        });
+
+        final Button btnFindBinPlasticBottle = rootView.findViewById(R.id.btnFindABinPlasticBottle);
+        btnFindBinPlasticBottle.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                getBinsWithMaterial(Constants.PLASTIC_BOTTLE, latitude, longitude);
+            }
+        });
+
+        final Button btnFindBinPlasticFoodWrappers = rootView.findViewById(R.id.btnFindABinFoodWrappers);
+        btnFindBinPlasticFoodWrappers.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                getBinsWithMaterial(Constants.PLASTIC_FOOD_WRAPPER, latitude, longitude);
+            }
+        });
 
         return rootView;
     }
-
-    private void initializeWasteItemList()
-    {
-        if(wasteItemList == null)
-        {
-            wasteItemList = new ArrayList<WasteItemRecyclerViewItem>();
-            wasteItemList.add(new WasteItemRecyclerViewItem("Plastic Food Wrapper", R.drawable.plastic_food_wrappers));
-            wasteItemList.add(new WasteItemRecyclerViewItem("Plastic Bottle", R.drawable.plastic_bottle));
-            wasteItemList.add(new WasteItemRecyclerViewItem("Drink Can", R.drawable.drink_can));
-            wasteItemList.add(new WasteItemRecyclerViewItem("Cardboard", R.drawable.cardboard));
-            wasteItemList.add(new WasteItemRecyclerViewItem("AA Battery", R.drawable.aa_battery));
-            wasteItemList.add(new WasteItemRecyclerViewItem("Plastic Overwrap Packaging", R.drawable.plastic_overwrap_packaging));
-        }
-    }
-
 
     private void startLocation() {
         SmartLocation.with(getContext()).location()
@@ -116,7 +135,7 @@ public class RecycleFragment extends Fragment implements OnLocationUpdatedListen
     }
 
 
-    public List<BinToBeReceived> getBinsInRadiusRestCall(String material, Double latitude, Double longitude) {
+    public List<BinToBeReceived> getBinsWithMaterial(String material, Double latitude, Double longitude) {
         Call<List<BinToBeReceived>> call = service.getBinsAtLocationAndMaterial(material, latitude, longitude);
 
         call.enqueue(new Callback<List<BinToBeReceived>>() {

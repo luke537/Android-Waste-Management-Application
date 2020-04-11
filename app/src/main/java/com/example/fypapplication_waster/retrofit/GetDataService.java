@@ -26,9 +26,4 @@ public interface GetDataService {
 
     @POST("add_bin")
     Call<ResponseBody> addBin(@Body BinToBeSent bin);
-
-//    @Multipart
-//    @POST("add_bin")
-//    Call<ResponseBody> addBin(@PartMap() Map<String, RequestBody> partMap,
-//                              @Part MultipartBody.Part image);
 }
