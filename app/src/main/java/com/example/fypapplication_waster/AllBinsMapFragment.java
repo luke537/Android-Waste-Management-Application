@@ -87,7 +87,7 @@ public class AllBinsMapFragment extends Fragment implements OnMapReadyCallback, 
         storage = FirebaseUtils.getFirebaseStorageInstance();
 
         if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, MY_PERMISSIONS_REQUEST_LOCATION);
+            ActivityCompat.requestPermissions(getActivity(), new String[] {Manifest.permission.ACCESS_FINE_LOCATION}, MY_PERMISSIONS_REQUEST_LOCATION);
             return;
         }
         startLocation();
@@ -248,7 +248,6 @@ public class AllBinsMapFragment extends Fragment implements OnMapReadyCallback, 
             Log.d(TAG, "No bins found");
             Toast.makeText(getActivity(), "Unfortunately, there were no bins found in your area", Toast.LENGTH_LONG).show();
         }
-
     }
 
     private void drawMarkerOnCurrentLocation() {

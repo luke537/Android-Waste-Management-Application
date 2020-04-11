@@ -2,6 +2,7 @@ package com.example.fypapplication_waster.retrofit;
 
 import com.example.fypapplication_waster.retrofit.model.BinToBeReceived;
 import com.example.fypapplication_waster.retrofit.model.BinToBeSent;
+import com.example.fypapplication_waster.retrofit.model.WasteMaterial;
 
 import java.util.List;
 

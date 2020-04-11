@@ -1,24 +1,32 @@
 package com.example.fypapplication_waster;
 
+import android.content.Context;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.fypapplication_waster.retrofit.model.BinToBeReceived;
 import com.google.android.material.snackbar.Snackbar;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class WasteItemRecyclerViewDataAdapter extends RecyclerView.Adapter<WasteItemRecyclerViewItemHolder> {
 
     private List<WasteItemRecyclerViewItem> wasteItemList;
+    private Double latitude, longitude;
 
-    public WasteItemRecyclerViewDataAdapter(List<WasteItemRecyclerViewItem> wasteItemList) {
+    public WasteItemRecyclerViewDataAdapter(List<WasteItemRecyclerViewItem> wasteItemList, Double latitude, Double longitude) {
         this.wasteItemList = wasteItemList;
+        this.latitude = latitude;
+        this.longitude = longitude;
     }
 
     @Override
@@ -32,17 +40,6 @@ public class WasteItemRecyclerViewDataAdapter extends RecyclerView.Adapter<Waste
         final TextView carTitleView = (TextView)carItemView.findViewById(R.id.card_view_image_title);
         // Get car image view object.
         final ImageView carImageView = (ImageView)carItemView.findViewById(R.id.card_view_image);
-        // When click the image.
-        carImageView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // Get car title text.
-                String carTitle = carTitleView.getText().toString();
-                // Create a snackbar and show it.
-                Snackbar snackbar = Snackbar.make(carImageView, "You click " + carTitle +" image", Snackbar.LENGTH_LONG);
-                snackbar.show();
-            }
-        });
 
         // Create and return our custom Car Recycler View Item Holder object.
         WasteItemRecyclerViewItemHolder ret = new WasteItemRecyclerViewItemHolder(carItemView);
@@ -61,6 +58,13 @@ public class WasteItemRecyclerViewDataAdapter extends RecyclerView.Adapter<Waste
                 holder.getwasteItemTitleText().setText(carItem.getWasteItemName());
                 // Set car image resource id.
                 holder.getCarImageView().setImageResource(carItem.getWasteItemImageId());
+
+                Button btnFindBin = holder.itemView.findViewById(R.id.btnFindABin);
+                btnFindBin.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                    }
+                });
             }
         }
     }

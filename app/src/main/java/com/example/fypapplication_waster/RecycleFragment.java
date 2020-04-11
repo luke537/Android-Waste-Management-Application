@@ -35,7 +35,6 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 public class RecycleFragment extends Fragment implements OnLocationUpdatedListener {
-    Button btnFindBin;
     GetDataService service;
 
     List<BinToBeReceived> matchedBins;
@@ -50,6 +49,16 @@ public class RecycleFragment extends Fragment implements OnLocationUpdatedListen
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(getActivity(), new String[] {Manifest.permission.ACCESS_FINE_LOCATION}, MY_PERMISSIONS_REQUEST_LOCATION);
+            return;
+        }
+        startLocation();
+
+        if (latitude == null || longitude == null) {
+            getLastLocation();
+        }
+
         service = RetrofitUtils.getRetrofitClientInstance();
         initializeWasteItemList();
     }
@@ -58,25 +67,6 @@ public class RecycleFragment extends Fragment implements OnLocationUpdatedListen
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.recycle_fragment_layout, container, false);
-//        btnFindBin = rootView.findViewById(R.id.btnGlass);
-//
-//        btnFindBin.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//
-//                if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-//                    ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, MY_PERMISSIONS_REQUEST_LOCATION);
-//                    return;
-//                }
-//                startLocation();
-//
-//                if (latitude == null || longitude == null) {
-//                    getLastLocation();
-//                }
-//
-//                getBinsInRadiusRestCall("glass", latitude, longitude);
-//            }
-//        });
 
         // Create the recyclerview.
         RecyclerView wasteItemRecyclerView = (RecyclerView) rootView.findViewById(R.id.card_view_recycler_list);
@@ -86,7 +76,7 @@ public class RecycleFragment extends Fragment implements OnLocationUpdatedListen
         wasteItemRecyclerView.setLayoutManager(gridLayoutManager);
 
         // Create car recycler view data adapter with car item list.
-        WasteItemRecyclerViewDataAdapter wasteItemDataAdapter = new WasteItemRecyclerViewDataAdapter(wasteItemList);
+        WasteItemRecyclerViewDataAdapter wasteItemDataAdapter = new WasteItemRecyclerViewDataAdapter(wasteItemList, latitude, longitude);
         // Set data adapter.
         wasteItemRecyclerView.setAdapter(wasteItemDataAdapter);
 
@@ -97,13 +87,13 @@ public class RecycleFragment extends Fragment implements OnLocationUpdatedListen
     {
         if(wasteItemList == null)
         {
-//            wasteItemList = new ArrayList<WasteItemRecyclerViewItem>();
-//            wasteItemList.add(new WasteItemRecyclerViewItem("Food Wrapper", R.drawable.wrapper));
-//            wasteItemList.add(new WasteItemRecyclerViewItem("Plastic Bottle", R.drawable.plastic_bottle));
-//            wasteItemList.add(new WasteItemRecyclerViewItem("Drink Can", R.drawable.drink_can));
-//            wasteItemList.add(new WasteItemRecyclerViewItem("Chewing Gum", R.drawable.chewing_gum));
-//            wasteItemList.add(new WasteItemRecyclerViewItem("Battery", R.drawable.battery));
-//            wasteItemList.add(new WasteItemRecyclerViewItem("Foam Takeaway Container", R.drawable.styrofoam_container));
+            wasteItemList = new ArrayList<WasteItemRecyclerViewItem>();
+            wasteItemList.add(new WasteItemRecyclerViewItem("Plastic Food Wrapper", R.drawable.plastic_food_wrappers));
+            wasteItemList.add(new WasteItemRecyclerViewItem("Plastic Bottle", R.drawable.plastic_bottle));
+            wasteItemList.add(new WasteItemRecyclerViewItem("Drink Can", R.drawable.drink_can));
+            wasteItemList.add(new WasteItemRecyclerViewItem("Cardboard", R.drawable.cardboard));
+            wasteItemList.add(new WasteItemRecyclerViewItem("AA Battery", R.drawable.aa_battery));
+            wasteItemList.add(new WasteItemRecyclerViewItem("Plastic Overwrap Packaging", R.drawable.plastic_overwrap_packaging));
         }
     }
 
@@ -136,7 +126,7 @@ public class RecycleFragment extends Fragment implements OnLocationUpdatedListen
                     Log.d(TAG, "Successful response getting bins");
                     matchedBins = response.body();
 
-//                    launchMapIntent();
+                    launchMapIntent();
                 }
             }
 
@@ -152,13 +142,13 @@ public class RecycleFragment extends Fragment implements OnLocationUpdatedListen
     }
 
 
-//    private void launchMapIntent() {
-//        Intent myIntent = new Intent(getContext(), MapsActivity.class);
-//        myIntent.putExtra("latitude", latitude);
-//        myIntent.putExtra("longitude", longitude);
-//        myIntent.putExtra("bins", (ArrayList<BinToBeReceived>) matchedBins);
-//        startActivity(myIntent);
-//    }
+    private void launchMapIntent() {
+        Intent myIntent = new Intent(getContext(), MapsActivity.class);
+        myIntent.putExtra("latitude", latitude);
+        myIntent.putExtra("longitude", longitude);
+        myIntent.putExtra("bins", (ArrayList<BinToBeReceived>) matchedBins);
+        startActivity(myIntent);
+    }
 
     @Override
     public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {

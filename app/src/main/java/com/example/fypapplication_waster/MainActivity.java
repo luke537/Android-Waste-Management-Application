@@ -34,44 +34,44 @@ public class MainActivity extends AppCompatActivity {
             new BottomNavigationView.OnNavigationItemSelectedListener() {
                 @Override
                 public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                    switch (item.getItemId()) {
-                        case R.id.navNewRecycle:
-                            if (recycleFragment.isAdded()) {
+                    switch (item.getItemId()) { // Check which tab is selected
+                        case R.id.navNewRecycle: // If Recycle tab is selected
+                            if (recycleFragment.isAdded()) { // Check if an instance of this Fragment exists on the backstack already
                                 getSupportFragmentManager().beginTransaction().hide(activeFragment).show(recycleFragment).commit();
                             }
-                            else {
+                            else { // Add Fragment to the backstack if it is not present on the stack already
                                 getSupportFragmentManager().beginTransaction()
                                         .add(R.id.fragmentContainer, recycleFragment, "recycleFragment")
                                         .hide(activeFragment).commit();
                             }
 
-                            activeFragment = recycleFragment;
+                            activeFragment = recycleFragment; // Make this the active Fragment
                             break;
 
-                        case R.id.navMap:
-                            if (allBinsMapFragment.isAdded()) {
+                        case R.id.navMap: // If map with all bins tab is selected
+                            if (allBinsMapFragment.isAdded()) { // Check if an instance of this Fragment exists on the backstack already
                                 getSupportFragmentManager().beginTransaction().hide(activeFragment).show(allBinsMapFragment).commit();
                             }
-                            else {
+                            else { // Add Fragment to the backstack if it is not present on the stack already
                                 getSupportFragmentManager().beginTransaction()
                                         .add(R.id.fragmentContainer, allBinsMapFragment, "allBinsMapFragment")
                                         .hide(activeFragment).commit();
                             }
 
-                            activeFragment = allBinsMapFragment;
+                            activeFragment = allBinsMapFragment; // Make this the active Fragment
                             break;
 
-                        case R.id.navProfile:
-                            if (profileFragment.isAdded()) {
+                        case R.id.navProfile: // If Profile tab is selected
+                            if (profileFragment.isAdded()) { // Check if an instance of this Fragment exists on the backstack already
                                 getSupportFragmentManager().beginTransaction().hide(activeFragment).show(profileFragment).commit();
                             }
-                            else {
+                            else { // Add Fragment to the backstack if it is not present on the stack already
                                 getSupportFragmentManager().beginTransaction()
                                         .add(R.id.fragmentContainer, profileFragment, "profileFragment")
                                         .hide(activeFragment).commit();
                             }
 
-                            activeFragment = profileFragment;
+                            activeFragment = profileFragment; // Make this the active Fragment
                             break;
                     }
 
