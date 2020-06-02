@@ -142,6 +142,16 @@ public class RecycleFragment extends Fragment implements OnLocationUpdatedListen
             @Override
             public void onResponse(Call<List<BinToBeReceived>> call, Response<List<BinToBeReceived>> response) {
                 if (response.isSuccessful()) {
+                    // time when the request was made to server, which you get from ```sentRequestAtMillis```
+                    long requestTime = response.raw().sentRequestAtMillis();
+
+                    // time when the response was received, which you get from ```receivedResponseAtMillis```
+                    long responseTime = response.raw().receivedResponseAtMillis();
+
+                    //time taken to receive the response after the request was sent
+                    long apiTime =  responseTime - requestTime;
+                    Log.i(TAG, String.format("Time taken to respond with %d waste containers: %d ms", response.body().size(), apiTime));
+
                     Log.d(TAG, "Successful response getting bins");
                     matchedBins = response.body();
 

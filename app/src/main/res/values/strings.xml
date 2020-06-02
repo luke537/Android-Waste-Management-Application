@@ -5,6 +5,8 @@
     <string name="bin_latitude_text_hint">Bin Latitude</string>
     <string name="bin_longitude_text_hint">Bin Longitude</string>
     <string name="bin_photo_text_hint">Bin Photo</string>
+    <string name="accessibility">Accessibility</string>
+    <string name="bin_details">Bin Details</string>
     <string name="go_to_add_a_bin">Go to Add a Bin</string>
     <string name="add_a_bin_heading">Go to Add a Bin</string>
     <string name="google_maps_api_key">AIzaSyDxVFnLFnAYk109PjJd1mQvUzBV5-nfXhs</string>

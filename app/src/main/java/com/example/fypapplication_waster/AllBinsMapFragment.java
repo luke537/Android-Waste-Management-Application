@@ -24,6 +24,8 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
+
+import com.example.fypapplication_waster.retrofit.model.Accessibility;
 import com.example.fypapplication_waster.retrofit.model.BinToBeReceived;
 import com.example.fypapplication_waster.retrofit.GetDataService;
 import com.example.fypapplication_waster.util.FirebaseUtils;
@@ -207,6 +209,16 @@ public class AllBinsMapFragment extends Fragment implements OnMapReadyCallback, 
             @Override
             public void onResponse(Call<List<BinToBeReceived>> call, Response<List<BinToBeReceived>> response) {
                 if (response.isSuccessful()) {
+                    // time when the request was made to server, which you get from ```sentRequestAtMillis```
+                    long requestTime = response.raw().sentRequestAtMillis();
+
+                    // time when the response was received, which you get from ```receivedResponseAtMillis```
+                    long responseTime = response.raw().receivedResponseAtMillis();
+
+                    //time taken to receive the response after the request was sent
+                    long apiTime =  responseTime - requestTime;
+                    Log.i(TAG, String.format("Time taken to respond with %d waste containers: %d ms", response.body().size(), apiTime));
+
                     Log.d(TAG, "Successful response getting bins");
                     matchedBins = response.body();
 
@@ -270,6 +282,7 @@ public class AllBinsMapFragment extends Fragment implements OnMapReadyCallback, 
             View mView = getLayoutInflater().inflate(R.layout.bin_info_modal, null);
             final TextView mBinName = (TextView) mView.findViewById(R.id.txtBinName);
             final TextView mBinMaterials = (TextView) mView.findViewById(R.id.txtBinMaterials);
+            final TextView binAccessibility = (TextView) mView.findViewById(R.id.txtBinAccessibility);
             final TextView mBinComments = (TextView) mView.findViewById(R.id.txtBinComments);
             binImgView = mView.findViewById(R.id.imgBinPic);
 
@@ -282,6 +295,14 @@ public class AllBinsMapFragment extends Fragment implements OnMapReadyCallback, 
                 for (Object material : bin.getMaterials()) {
                     mBinMaterials.append((String) material + "\n");
                 }
+            }
+
+            final Accessibility accessibility = bin.getAccessibility();
+            if (accessibility.isInside()) {
+                binAccessibility.append("Inside\n" + "Building Name: " + accessibility.getBuildingName() + "\n" + "Building Floor: " + accessibility.getBuildingFloor());
+            }
+            else {
+                binAccessibility.append("Outside");
             }
 
             if (bin.getComments() != null) {

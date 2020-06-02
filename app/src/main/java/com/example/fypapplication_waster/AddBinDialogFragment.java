@@ -47,7 +47,7 @@ public class AddBinDialogFragment extends DialogFragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         super.onCreateView(inflater, container, savedInstanceState);
-        
+
         View rootView = inflater.inflate(R.layout.add_bin_modal, container, false);
         final TextView binName = rootView.findViewById(R.id.txtBinName);
         final CheckBox cbxClearGlass = rootView.findViewById(R.id.cbxClearGlass);
@@ -93,7 +93,8 @@ public class AddBinDialogFragment extends DialogFragment {
         btnTakePhoto.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                photoUri = CameraUtils.dispatchTakePictureIntentAndGetUri(AddBinDialogFragment.this);            }
+                photoUri = CameraUtils.dispatchTakePictureIntentAndGetUri(AddBinDialogFragment.this);
+            }
         });
 
         Button btnCancel = rootView.findViewById(R.id.btnCancelAddBin);
